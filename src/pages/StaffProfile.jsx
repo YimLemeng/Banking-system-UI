@@ -106,24 +106,16 @@ export default function StaffProfile({ onNotify }) {
   return (
     <div className="space-y-6 max-w-4xl mx-auto pb-16 pt-2">
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-extrabold text-white tracking-tight flex items-center gap-2.5">
-            <ShieldCheck className="w-6 h-6 text-blue-400" />
-            <span>{lang === 'kh' ? 'ប្រវត្តិរូប និងសុវត្ថិភាពគណនី' : 'Staff Profile & Security'}</span>
-          </h1>
-          <p className="text-xs text-slate-400 mt-1">
-            {lang === 'kh'
-              ? 'គ្រប់គ្រងព័ត៌មានអត្តសញ្ញាណបុគ្គលិក កម្រិតសិទ្ធិប្រើប្រាស់ប្រព័ន្ធ និងផ្លាស់ប្តូរលេខសម្ងាត់សុវត្ថិភាព'
-              : 'Officer identity profile, terminal privileges, and cryptographic credential management'}
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="px-3 py-1 rounded-xl text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5 shadow-sm">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span>{lang === 'kh' ? 'សម័យប្រតិបត្តិការកំពុងសកម្ម' : 'Active JWT Session'}</span>
-          </span>
-        </div>
+      <div>
+        <h1 className="text-2xl font-extrabold text-white tracking-tight flex items-center gap-2.5">
+          <ShieldCheck className="w-6 h-6 text-blue-400" />
+          <span>{lang === 'kh' ? 'ប្រវត្តិរូប និងសុវត្ថិភាពគណនី' : 'Staff Profile & Security'}</span>
+        </h1>
+        <p className="text-xs text-slate-400 mt-1">
+          {lang === 'kh'
+            ? 'គ្រប់គ្រងព័ត៌មានអត្តសញ្ញាណបុគ្គលិក កម្រិតសិទ្ធិប្រើប្រាស់ប្រព័ន្ធ និងផ្លាស់ប្តូរលេខសម្ងាត់សុវត្ថិភាព'
+            : 'Officer identity profile, terminal privileges, and cryptographic credential management'}
+        </p>
       </div>
 
       {/* Grid: Profile Card on left/top, Change Password on right/bottom */}
