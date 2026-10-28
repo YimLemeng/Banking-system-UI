@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M3 21h18'/><path d='M3 10h18'/><path d='M5 6l7-3 7 3'/><path d='M4 10v11'/><path d='M20 10v11'/><path d='M8 14v4'/><path d='M12 14v4'/><path d='M16 14v4'/></svg>" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TRUST BANK | Core Banking Terminal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+      @media screen {
+        html, body {
+          background-color: #070a13 !important;
+          margin: 0 !important;
+          padding: 0 !important;
+          width: 100%;
+          height: 100%;
+          overflow: hidden;
+        }
+      }
+      @media print {
+        * {
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
+          color-adjust: exact !important;
+        }
+        html, body, #root, #root > div, main {
+          background: #ffffff !important;
+          background-color: #ffffff !important;
+          color: #0f172a !important;
+          margin: 0 !important;
+          padding: 0 !important;
+          width: 100% !important;
+          min-height: 0 !important;
+          height: auto !important;
+          box-shadow: none !important;
+          border: none !important;
+        }
+      }
+      @keyframes tb-spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+    </style>
+  </head>
+  <body class="bg-obsidian-950 text-slate-100 antialiased selection:bg-brand-500 selection:text-white">
+    <div id="root">
+      <div style="position: fixed; inset: 0; width: 100vw; height: 100vh; background-color: #070a13; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: 'Plus Jakarta Sans', sans-serif; color: #f8fafc; user-select: none; z-index: 99999;">
+        <div style="position: relative; width: 64px; height: 64px; margin-bottom: 20px; display: flex; align-items: center; justify-content: center;">
+          <div style="position: absolute; inset: 0; border-radius: 9999px; border: 3px solid rgba(30, 41, 59, 0.8);"></div>
+          <div style="width: 56px; height: 56px; border-radius: 9999px; border: 3.5px solid transparent; border-top-color: #34d399; border-right-color: rgba(16, 185, 129, 0.8); animation: tb-spin 0.9s linear infinite; filter: drop-shadow(0 0 14px rgba(52, 211, 153, 0.6));"></div>
+        </div>
+        <div style="font-size: 17px; font-weight: 800; letter-spacing: -0.02em; color: #ffffff;">TRUST BANK</div>
+        <div style="font-size: 11px; font-weight: 600; color: #64748b; letter-spacing: 0.06em; text-transform: uppercase; margin-top: 4px;">Core Banking Terminal • Loading...</div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

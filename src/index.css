@@ -1,0 +1,181 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-obsidian-950 text-slate-100 font-sans antialiased;
+  }
+}
+
+/* Custom Utilities for Banking UI */
+.glass-panel {
+  background: rgba(13, 21, 38, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-card {
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.glow-blue {
+  box-shadow: 0 0 25px -5px rgba(59, 130, 246, 0.3);
+}
+
+.glow-emerald {
+  box-shadow: 0 0 25px -5px rgba(16, 185, 129, 0.3);
+}
+
+/* Custom Scrollbar for Terminals */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #060b14;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}
+
+/* Print Only Styles for Official Bank Documents */
+@page {
+  size: A4 portrait;
+  margin: 0;
+}
+
+@media print {
+  /* Force browsers to print exact background colors and badges */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
+  /* Strip dark background and container chrome on print so paper is pure white */
+  html, 
+  body {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    background-image: none !important;
+    font-size: 10pt !important;
+    min-height: 100vh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+  }
+
+  /* Reset layout wrappers to pure white and zero margin/padding */
+  #root,
+  #root > div,
+  .min-h-screen,
+  main {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    background-image: none !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: 100vh !important;
+    overflow: visible !important;
+    max-height: none !important;
+  }
+
+  /* Hide navigation, header, sidebar, toast, fixed overlays, modals, and screen-only controls */
+  header, 
+  aside, 
+  nav,
+  footer,
+  .no-print,
+  button,
+  input,
+  select,
+  .fixed,
+  [role="alert"] {
+    display: none !important;
+  }
+
+  /* Hide screen-only interactive views when printing */
+  .screen-only-statement,
+  .screen-only-teller {
+    display: none !important;
+  }
+
+  /* Show the official bank statement document */
+  .official-statement-print {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: 270mm !important;
+    margin: 0 !important;
+    padding: 14mm 18mm !important;
+    box-sizing: border-box !important;
+    border: none !important;
+    box-shadow: none !important;
+    page-break-inside: avoid !important;
+    page-break-after: avoid !important;
+  }
+
+  /* Show the official teller receipt slip document (Clean A4 Document) */
+  .official-teller-slip-print {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: 270mm !important;
+    margin: 0 !important;
+    padding: 12mm 16mm !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    box-sizing: border-box !important;
+    page-break-inside: avoid !important;
+    page-break-after: avoid !important;
+  }
+
+  /* Pinned bottom section for official prints */
+  .print-bottom-section {
+    margin-top: auto !important;
+    width: 100% !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  /* Avoid breaking inside table rows or cards */
+  tr, .print-avoid-break {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+}
+
+/* Hide print-only document when on screen */
+@media screen {
+  .official-statement-print,
+  .official-teller-slip-print {
+    display: none !important;
+  }
+}
