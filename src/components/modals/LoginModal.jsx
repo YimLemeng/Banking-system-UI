@@ -9,7 +9,7 @@ export default function LoginModal({ isOpen, onClose, onSuccess }) {
   const { theme } = useTheme();
 
   const [identifier, setIdentifier] = useState('admin');
-  const [password, setPassword] = useState('Admin@1234');
+  const [password, setPassword] = useState('password123');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
