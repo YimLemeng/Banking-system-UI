@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
-import { CheckCircle2, AlertTriangle, X, Bell } from 'lucide-react';
+import { createPortal } from 'react-dom';
+import { CheckCircle2, AlertTriangle, X } from 'lucide-react';
 
 export default function Toast({ message, type = 'success', onClose }) {
   useEffect(() => {
@@ -14,8 +15,8 @@ export default function Toast({ message, type = 'success', onClose }) {
 
   const isSuccess = type === 'success';
 
-  return (
-    <div className="fixed top-20 right-6 z-[250] transition-all duration-300 transform animate-fadeIn no-print">
+  return createPortal(
+    <div className="fixed bottom-6 right-6 z-[300] transition-all duration-300 transform animate-fadeIn no-print pointer-events-auto">
       <div className={`flex items-center gap-3 px-4 py-3 rounded-2xl shadow-2xl backdrop-blur-xl border ${
         isSuccess 
           ? 'bg-[#0b1426]/95 text-emerald-300 border-emerald-500/40 shadow-emerald-950/50' 
@@ -43,6 +44,7 @@ export default function Toast({ message, type = 'success', onClose }) {
           <X className="w-3.5 h-3.5" />
         </button>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
