@@ -310,6 +310,7 @@ export default function App() {
         isOnline={isOnline}
         sidebarCollapsed={sidebarCollapsed}
         onToggleSidebar={toggleSidebar}
+        onOpenProfile={() => switchTab('profile')}
       />
 
       {/* Top Loading Progress Bar */}
@@ -415,7 +416,7 @@ export default function App() {
             />
           )}
 
-          {activeTab === 'profile' && <StaffProfile />}
+          {activeTab === 'profile' && <StaffProfile onNotify={showNotification} />}
         </main>
       </div>
 

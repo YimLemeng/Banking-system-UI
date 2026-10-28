@@ -45,6 +45,9 @@ export const authService = {
   register: async (userData) => {
     return apiClient.post('/auth/register', userData);
   },
+  changePassword: async (passwords) => {
+    return apiClient.post('/auth/change-password', passwords);
+  },
 };
 
 export const customerService = {

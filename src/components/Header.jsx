@@ -21,7 +21,8 @@ import { useTheme } from '../context/ThemeContext';
 export default function Header({ 
   isOnline = true, 
   sidebarCollapsed = false, 
-  onToggleSidebar
+  onToggleSidebar,
+  onOpenProfile
 }) {
   const { user, isAuthenticated, lang, setLang, t, isAdmin } = useAuth();
   const { currentTheme, setCurrentTheme, themes, theme } = useTheme();
@@ -173,13 +174,16 @@ export default function Header({
           </button>
         </div>
 
-        {/* User Profile Pill (Display Badge - Non Clickable) */}
-        <div 
-          className="flex items-center gap-2.5 pl-2 pr-3 py-1.5 rounded-2xl bg-slate-900/90 border border-slate-700/70 shadow-sm backdrop-blur-md select-none transition-all hover:border-slate-600/80"
+        {/* User Profile Pill (Clickable to view Profile & Change Password) */}
+        <button 
+          type="button"
+          onClick={onOpenProfile}
+          title={lang === 'kh' ? 'មើលប្រវត្តិរូប និងផ្លាស់ប្តូរលេខសម្ងាត់' : 'View Profile & Change Password'}
+          className="flex items-center gap-2.5 pl-2 pr-3 py-1.5 rounded-2xl bg-slate-900/90 border border-slate-700/70 shadow-sm backdrop-blur-md select-none transition-all hover:border-slate-500 hover:bg-slate-800/80 cursor-pointer text-left group"
         >
           {/* Avatar with dynamic role gradient & online status */}
           <div className="relative">
-            <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-white font-bold text-xs shadow-md ${
+            <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-white font-bold text-xs shadow-md transition-transform group-hover:scale-105 ${
               isAdmin 
                 ? 'bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-500 shadow-blue-500/20 border border-blue-400/30'
                 : 'bg-gradient-to-tr from-emerald-600 via-teal-600 to-teal-500 shadow-emerald-500/20 border border-emerald-400/30'
@@ -195,7 +199,7 @@ export default function Header({
           </div>
 
           <div className="text-left">
-            <div className="text-xs font-bold text-slate-100 leading-tight">
+            <div className="text-xs font-bold text-slate-100 leading-tight group-hover:text-blue-400 transition-colors">
               {getUserDisplayName()}
             </div>
             <div className="flex items-center gap-1 mt-0.5">
@@ -205,7 +209,7 @@ export default function Header({
               </span>
             </div>
           </div>
-        </div>
+        </button>
       </div>
     </header>
   );

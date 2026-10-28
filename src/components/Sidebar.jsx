@@ -7,6 +7,7 @@ import {
   Users2, 
   Users, 
   Shield, 
+  UserCheck,
   LogOut 
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -66,6 +67,7 @@ export default function Sidebar({
     { id: 'kyc', label: t.customerKYC || 'Customer KYC & Moderation', icon: Users2 },
     { id: 'users', label: t.systemUsers || 'System Users', icon: Users, adminOnly: true },
     { id: 'audit', label: t.auditTrail || 'Audit Trail', icon: Shield, adminOnly: true },
+    { id: 'profile', label: lang === 'kh' ? 'ប្រវត្តិរូប និងសុវត្ថិភាព' : 'Profile & Security', icon: UserCheck },
   ];
 
   const branchMgmt = allBranchMgmt.filter(item => !item.adminOnly || isAdmin);
