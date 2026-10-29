@@ -89,3 +89,14 @@ The application will be available at:
 npm run build
 npm run preview
 ```
+
+---
+
+## 👤 Demo / Test Credentials
+
+Use these pre-configured user credentials to sign in and test the system terminal:
+
+| Role | Username / Identifier | Password | Access Privileges |
+|---|---|---|---|
+| **System Administrator** | `admin` | `admin123` | Full Access: Customer KYC, Depository Accounts, Transactions, System Users, Audit Trail, Profile & Security |
+| **Bank Teller Officer** | `teller` | `teller123` | Branch Operations: Teller Counter, Cash Deposit, Withdrawal, Transfer, KYC, Account Statements |
