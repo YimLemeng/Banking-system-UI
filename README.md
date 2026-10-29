@@ -3,7 +3,7 @@
 Professional enterprise React.js web client for the Spring Boot Core Banking system, featuring a **Luxury Midnight Obsidian & Royal Cobalt/Sapphire** design, multi-currency display (USD & KHR), full Khmer (ភាសាខ្មែរ) & English localization, and complete REST API integration.
 
 > 🌐 **Live Demo Website**: [https://banking-system.yimlemeng.workers.dev](https://banking-system.yimlemeng.workers.dev)  
-> 🔗 **Backend API Swagger**: [https://lemeng-banking-api.duckdns.org/swagger-ui.html](https://lemeng-banking-api.duckdns.org/swagger-ui.html)  
+> ⚙️ **Backend REST API Repository**: [https://github.com/YimLemeng/Banking-system](https://github.com/YimLemeng/Banking-system)  
 > 👤 **Test Accounts**: `admin` / `admin123` (Admin) • `teller` / `teller123` (Teller)
 
 ---
