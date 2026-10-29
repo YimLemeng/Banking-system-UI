@@ -93,14 +93,3 @@ The application will be available at:
 npm run build
 npm run preview
 ```
-
----
-
-## 👤 Demo / Test Credentials
-
-You can test the system directly on the live website: 👉 **[https://banking-system.yimlemeng.workers.dev](https://banking-system.yimlemeng.workers.dev)**
-
-| Role | Username / Identifier | Password | Access Privileges |
-|---|---|---|---|
-| **System Administrator** | `admin` | `admin123` | Full Access: Customer KYC, Depository Accounts, Transactions, System Users, Audit Trail, Profile & Security |
-| **Bank Teller Officer** | `teller` | `teller123` | Branch Operations: Teller Counter, Cash Deposit, Withdrawal, Transfer, KYC, Account Statements |
