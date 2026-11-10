@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
+import { isTokenExpired, parseJwt } from '../services/api';
 
 const AuthContext = createContext();
 
@@ -68,6 +69,9 @@ export const translations = {
     confirm: 'Confirm Transaction',
     cancel: 'Cancel',
     processing: 'Processing...',
+    sessionExpired: 'Your session has expired. Please sign in again.',
+    inactivityLogout: 'Terminal locked automatically due to 15 minutes of inactivity for security.',
+    multiTabLogout: 'You have signed out from another browser tab.',
   },
   kh: {
     terminalTitle: 'ប្រព័ន្ធប្រតិបត្តិការធនាគារស្នូល',
@@ -133,16 +137,37 @@ export const translations = {
     confirm: 'បញ្ជាក់ប្រតិបត្តិការ',
     cancel: 'បោះបង់',
     processing: 'កំពុងដំណើរការ...',
+    sessionExpired: 'សម័យប្រតិបត្តិការបានផុតកំណត់ សូមចូលប្រើប្រាស់ម្តងទៀត',
+    inactivityLogout: 'ស្ថានីយត្រូវបានចាក់សោរដោយស្វ័យប្រវត្ត ដោយសារគ្មានសកម្មភាពរយៈពេល ១៥ នាទី (សុវត្ថិភាពធនាគារ)',
+    multiTabLogout: 'អ្នកបានចាកចេញពីផ្ទាំង Browser ផ្សេងរួចហើយ',
   }
 };
 
+const INACTIVITY_TIMEOUT = 15 * 60 * 1000; // 15 Minutes idle auto-lock (Banking Security Standard)
+
 export const AuthProvider = ({ children }) => {
-  const [token, setToken] = useState(() => localStorage.getItem('trustbank_token') || '');
-  const [user, setUser] = useState(() => {
-    const saved = localStorage.getItem('trustbank_user');
-    return saved ? JSON.parse(saved) : null;
+  // Safe initialization: check if token is expired before loading state
+  const [token, setToken] = useState(() => {
+    const savedToken = localStorage.getItem('trustbank_token') || '';
+    if (savedToken && !isTokenExpired(savedToken)) {
+      return savedToken;
+    }
+    localStorage.removeItem('trustbank_token');
+    localStorage.removeItem('trustbank_user');
+    return '';
   });
+
+  const [user, setUser] = useState(() => {
+    const savedToken = localStorage.getItem('trustbank_token');
+    if (!savedToken || isTokenExpired(savedToken)) {
+      return null;
+    }
+    const savedUser = localStorage.getItem('trustbank_user');
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
+
   const [lang, setLang] = useState(() => localStorage.getItem('trustbank_lang') || 'en');
+  const [authAlert, setAuthAlert] = useState(null);
 
   useEffect(() => {
     localStorage.setItem('trustbank_lang', lang);
@@ -151,18 +176,102 @@ export const AuthProvider = ({ children }) => {
   const login = (tokenData, userData) => {
     setToken(tokenData);
     setUser(userData);
+    setAuthAlert(null);
     localStorage.setItem('trustbank_token', tokenData);
     localStorage.setItem('trustbank_user', JSON.stringify(userData));
   };
 
-  const logout = () => {
+  const logout = useCallback((reason = '') => {
     setToken('');
     setUser(null);
     localStorage.removeItem('trustbank_token');
     localStorage.removeItem('trustbank_user');
-  };
+    localStorage.removeItem('trustbank_active_tab');
+    if (reason) {
+      setAuthAlert(reason);
+    }
+  }, []);
 
-  const isAuthenticated = Boolean(token && user);
+  const clearAuthAlert = useCallback(() => {
+    setAuthAlert(null);
+  }, []);
+
+  const isAuthenticated = Boolean(token && user && !isTokenExpired(token));
+
+  // Multi-Tab Synchronization: Auto-logout or login if changed in another browser tab
+  useEffect(() => {
+    const handleStorageChange = (e) => {
+      if (e.key === 'trustbank_token') {
+        if (!e.newValue) {
+          setToken('');
+          setUser(null);
+          setAuthAlert('multiTabLogout');
+        } else if (e.newValue !== token && !isTokenExpired(e.newValue)) {
+          setToken(e.newValue);
+          const savedUser = localStorage.getItem('trustbank_user');
+          setUser(savedUser ? JSON.parse(savedUser) : null);
+        }
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, [token]);
+
+  // Global 401 Unauthorized Event Listener (Triggered by axios interceptor)
+  useEffect(() => {
+    const handleUnauthorized = (e) => {
+      const reason = e.detail?.reason || 'sessionExpired';
+      logout(reason);
+    };
+
+    window.addEventListener('trustbank:unauthorized', handleUnauthorized);
+    return () => window.removeEventListener('trustbank:unauthorized', handleUnauthorized);
+  }, [logout]);
+
+  // Proactive JWT Expiry Timer: Automatically log out exactly when the JWT expires
+  useEffect(() => {
+    if (!token) return;
+    const payload = parseJwt(token);
+    if (!payload?.exp) return;
+
+    const msUntilExpiry = payload.exp * 1000 - Date.now();
+    if (msUntilExpiry <= 0) {
+      logout('sessionExpired');
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      logout('sessionExpired');
+    }, msUntilExpiry);
+
+    return () => clearTimeout(timer);
+  }, [token, logout]);
+
+  // Terminal Inactivity Auto-Lock: Automatically lock after 15 minutes of idle
+  const lastActivityRef = useRef(Date.now());
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    const updateActivity = () => {
+      lastActivityRef.current = Date.now();
+    };
+
+    const events = ['mousedown', 'keydown', 'scroll', 'touchstart', 'click'];
+    events.forEach((evt) => window.addEventListener(evt, updateActivity, { passive: true }));
+
+    const checkInterval = setInterval(() => {
+      if (Date.now() - lastActivityRef.current >= INACTIVITY_TIMEOUT) {
+        logout('inactivityLogout');
+      }
+    }, 15000); // Check every 15 seconds
+
+    return () => {
+      events.forEach((evt) => window.removeEventListener(evt, updateActivity));
+      clearInterval(checkInterval);
+    };
+  }, [isAuthenticated, logout]);
 
   const t = translations[lang] || translations.en;
 
@@ -170,13 +279,26 @@ export const AuthProvider = ({ children }) => {
     isAuthenticated && (
       user?.role === 'ROLE_ADMIN' || 
       user?.role === 'ADMIN' || 
-      user?.username?.toLowerCase() === 'admin' ||
-      user?.username?.toLowerCase().includes('admin')
+      user?.username?.toLowerCase() === 'admin'
     )
   );
 
   return (
-    <AuthContext.Provider value={{ token, user, isAuthenticated, isAdmin, login, logout, lang, setLang, t }}>
+    <AuthContext.Provider 
+      value={{ 
+        token, 
+        user, 
+        isAuthenticated, 
+        isAdmin, 
+        login, 
+        logout, 
+        lang, 
+        setLang, 
+        t,
+        authAlert,
+        clearAuthAlert
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

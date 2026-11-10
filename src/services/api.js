@@ -3,6 +3,33 @@ import axios from 'axios';
 // Connect to Cloud VPS backend or fallback to local proxy
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api/v1';
 
+// JWT Helper: Parse token payload safely
+export const parseJwt = (token) => {
+  try {
+    if (!token || typeof token !== 'string') return null;
+    const parts = token.split('.');
+    if (parts.length !== 3) return null;
+    const base64Url = parts[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
+    return JSON.parse(jsonPayload);
+  } catch (e) {
+    return null;
+  }
+};
+
+// JWT Helper: Check if token is expired (includes 5-second buffer)
+export const isTokenExpired = (token) => {
+  const payload = parseJwt(token);
+  if (!payload || !payload.exp) return true;
+  return payload.exp * 1000 <= Date.now() + 5000;
+};
+
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
   headers: {
@@ -11,27 +38,45 @@ export const apiClient = axios.create({
   timeout: 10000,
 });
 
-// Interceptor to inject JWT Bearer token
+// Interceptor to inject JWT Bearer token & guard against expired tokens
 apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('trustbank_token');
-    if (token && token.split('.').length === 3) {
+    if (token) {
+      if (isTokenExpired(token)) {
+        localStorage.removeItem('trustbank_token');
+        localStorage.removeItem('trustbank_user');
+        window.dispatchEvent(
+          new CustomEvent('trustbank:unauthorized', {
+            detail: { reason: 'session_expired' },
+          })
+        );
+        return Promise.reject(new Error('Session expired'));
+      }
       config.headers.Authorization = `Bearer ${token}`;
-    } else if (token && token.startsWith('mock_')) {
-      localStorage.removeItem('trustbank_token');
-      localStorage.removeItem('trustbank_user');
     }
     return config;
   },
   (error) => Promise.reject(error)
 );
 
-// Response interceptor to handle expired or invalid tokens
+// Response interceptor to handle expired or invalid tokens (401)
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      console.warn('Unauthorized request - session may be expired');
+      console.warn('Unauthorized request (401) - session invalid or expired');
+      localStorage.removeItem('trustbank_token');
+      localStorage.removeItem('trustbank_user');
+      window.dispatchEvent(
+        new CustomEvent('trustbank:unauthorized', {
+          detail: { 
+            reason: 'session_expired', 
+            status: 401, 
+            message: error.response?.data?.message || 'Session expired' 
+          },
+        })
+      );
     }
     return Promise.reject(error);
   }

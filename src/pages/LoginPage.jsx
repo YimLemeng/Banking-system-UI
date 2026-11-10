@@ -14,13 +14,13 @@ import {
   Palette,
   ChevronDown
 } from 'lucide-react';
-import { authService } from '../services/api';
+import { authService, parseJwt } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { useLoading } from '../context/LoadingContext';
 
 export default function LoginPage({ onLoginSuccess, onSkipToDemo }) {
-  const { login, lang, setLang, t } = useAuth();
+  const { login, lang, setLang, t, authAlert, clearAuthAlert } = useAuth();
   const { currentTheme, setCurrentTheme, themes, theme } = useTheme();
   const { withLoading } = useLoading();
 
@@ -53,6 +53,7 @@ export default function LoginPage({ onLoginSuccess, onSkipToDemo }) {
     }
 
     setError('');
+    if (authAlert) clearAuthAlert();
 
     await withLoading(
       lang === 'kh' ? 'កំពុងផ្ទៀងផ្ទាត់គណនីចូលប្រព័ន្ធ...' : 'Authenticating Terminal Officer Credentials...',
@@ -60,11 +61,14 @@ export default function LoginPage({ onLoginSuccess, onSkipToDemo }) {
         try {
           const res = await authService.login(identifier, password);
           const data = res.data;
-          const isTeller = (data.username || identifier).toLowerCase() === 'teller';
-          const isAdminUser = (data.username || identifier).toLowerCase().includes('admin');
+          const payload = parseJwt(data.token);
+          const userRole = data.role || payload?.role || (data.username?.toLowerCase().includes('admin') ? 'ROLE_ADMIN' : 'ROLE_USER');
+          const isAdminUser = userRole === 'ROLE_ADMIN' || userRole === 'ADMIN';
+          const isTeller = userRole === 'ROLE_USER' || data.username?.toLowerCase() === 'teller';
+          
           login(data.token, {
             username: data.username || identifier,
-            role: data.role || (isAdminUser ? 'ROLE_ADMIN' : 'ROLE_TELLER'),
+            role: userRole,
             fullName: isAdminUser ? 'System Administrator' : (isTeller ? 'Teller Officer' : (data.username || 'Bank Officer')),
             email: data.email || `${identifier}@trustbank.com`,
           });
@@ -188,6 +192,13 @@ export default function LoginPage({ onLoginSuccess, onSkipToDemo }) {
                 : 'Enter your credentials to access the banking terminal'}
             </p>
           </div>
+
+          {authAlert && !error && (
+            <div className="mb-4 p-3 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              <span>{t[authAlert] || authAlert}</span>
+            </div>
+          )}
 
           {error && (
             <div className="mb-4 p-3 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2">
