@@ -42,40 +42,19 @@ export default function CustomerKYC({
     }
   };
 
-  const handleView = async (cust) => {
-    await withLoading(
-      lang === 'kh' ? 'កំពុងទាញយកព័ត៌មានអតិថិជន...' : 'Loading Customer KYC & Profiles...',
-      async () => {
-        await new Promise(r => setTimeout(r, 200));
-      },
-      300
-    );
+  const handleView = (cust) => {
     if (onOpenViewCustomer) {
       onOpenViewCustomer(cust);
     }
   };
 
-  const handleEdit = async (cust) => {
-    await withLoading(
-      lang === 'kh' ? 'កំពុងទាញយកទិន្នន័យកែប្រែ...' : 'Loading Client Profile for Edit...',
-      async () => {
-        await new Promise(r => setTimeout(r, 200));
-      },
-      300
-    );
+  const handleEdit = (cust) => {
     if (onOpenEditCustomer) {
       onOpenEditCustomer(cust);
     }
   };
 
-  const handleOpenAccount = async (cust) => {
-    await withLoading(
-      lang === 'kh' ? 'កំពុងរៀបចំទម្រង់បើកគណនី...' : 'Preparing Account Creation...',
-      async () => {
-        await new Promise(r => setTimeout(r, 200));
-      },
-      300
-    );
+  const handleOpenAccount = (cust) => {
     if (onOpenCreateAccount) {
       onOpenCreateAccount(cust);
     }

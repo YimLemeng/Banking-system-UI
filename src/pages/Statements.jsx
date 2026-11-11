@@ -139,23 +139,7 @@ export default function Statements({ accounts = [], onRefresh }) {
 
   const handleAccountChange = (e) => {
     const accNum = e.target.value;
-    if (!accNum) {
-      setSelectedAccount('');
-      return;
-    }
-    const accObj = accounts.find(a => a.accountNumber === accNum);
-    withLoading(
-      lang === 'kh' 
-        ? `កំពុងទាញយករបាយការណ៍គណនី ${accNum}...` 
-        : `Loading Statement for Account ${accNum}...`,
-      async () => {
-        setSelectedAccount(accNum);
-      },
-      500,
-      lang === 'kh'
-        ? `សូមរង់ចាំមួយភ្លែត កំពុងទាញយកប្រវត្តិប្រតិបត្តិការរបស់ ${accObj ? accObj.customerName : accNum}...`
-        : `Please wait while the request is processing.`
-    );
+    setSelectedAccount(accNum || '');
   };
 
   const handlePrint = () => {

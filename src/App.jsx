@@ -142,14 +142,10 @@ export default function App() {
     }
 
     if (newTab === activeTab) return;
-    setTabLoading(true);
     setActiveTab(newTab);
     const targetPath = newTab === 'overview' ? '/' : `/${newTab}`;
     window.history.pushState({ page: newTab }, '', targetPath);
     localStorage.setItem('trustbank_active_tab', newTab);
-    setTimeout(() => {
-      setTabLoading(false);
-    }, 280);
   };
 
   const navigateToTeller = (operation, accountNum = '') => {
@@ -173,84 +169,64 @@ export default function App() {
     setSidebarCollapsed(prev => !prev);
   };
 
-  // Fetch real data from backend
+  // Fetch real data from backend in parallel
   const fetchAllData = useCallback(async () => {
     setLoading(true);
     let onlineStatus = false;
 
-    // Accounts
     try {
-      const accRes = await accountService.getAll(0, 100);
-      const accContent = accRes.data?.content || accRes.data;
-      if (Array.isArray(accContent)) {
-        setAccounts(accContent);
-        onlineStatus = true;
+      const requests = [
+        accountService.getAll(0, 100),
+        customerService.getAll('', 0, 100),
+      ];
+
+      // Only fetch audit logs if admin to prevent 403 Forbidden latency
+      if (isAdmin) {
+        requests.push(auditService.getAll(0, 100));
+      }
+
+      const results = await Promise.allSettled(requests);
+      const [accResult, custResult, auditResult] = results;
+
+      if (accResult && accResult.status === 'fulfilled') {
+        const accContent = accResult.value?.data?.content || accResult.value?.data;
+        if (Array.isArray(accContent)) {
+          setAccounts(accContent);
+          onlineStatus = true;
+        }
+      }
+
+      if (custResult && custResult.status === 'fulfilled') {
+        const custContent = custResult.value?.data?.content || custResult.value?.data;
+        if (Array.isArray(custContent)) {
+          setCustomers(custContent);
+          onlineStatus = true;
+        }
+      }
+
+      if (auditResult && auditResult.status === 'fulfilled') {
+        const auditContent = auditResult.value?.data?.content || auditResult.value?.data;
+        if (Array.isArray(auditContent)) {
+          setAuditLogs(auditContent);
+          onlineStatus = true;
+        }
       }
     } catch (e) {
-      console.warn('Could not load accounts from database:', e);
+      console.warn('Could not load core banking data:', e);
+    } finally {
+      setIsOnline(onlineStatus);
+      setLoading(false);
     }
-
-    // Customers
-    try {
-      const custRes = await customerService.getAll('', 0, 100);
-      const custContent = custRes.data?.content || custRes.data;
-      if (Array.isArray(custContent)) {
-        setCustomers(custContent);
-        onlineStatus = true;
-      }
-    } catch (e) {
-      console.warn('Could not load customers from database:', e);
-    }
-
-    // Audit logs
-    try {
-      const auditRes = await auditService.getAll(0, 100);
-      const auditContent = auditRes.data?.content || auditRes.data;
-      if (Array.isArray(auditContent)) {
-        setAuditLogs(auditContent);
-        onlineStatus = true;
-      }
-    } catch (e) {
-      console.warn('Could not load audit logs from database:', e);
-    }
-
-    setIsOnline(onlineStatus);
-    setLoading(false);
-  }, []);
-
-  const initialLoadDone = useRef(false);
+  }, [isAdmin]);
 
   useEffect(() => {
     if (isAuthenticated) {
-      if (!initialLoadDone.current) {
-        initialLoadDone.current = true;
-        withLoading(
-          lang === 'kh'
-            ? 'កំពុងទាញយកទិន្នន័យពី Core Banking...'
-            : 'Initializing Core Banking Ledger & Session...',
-          async () => {
-            await fetchAllData();
-          },
-          750,
-          lang === 'kh'
-            ? 'សូមរង់ចាំមួយភ្លែត ប្រព័ន្ធកំពុងផ្ទៀងផ្ទាត់ និងទាញយកទិន្នន័យពី Server...'
-            : 'Syncing accounts, clients, and depository balances from server...'
-        );
-      } else {
-        fetchAllData();
-      }
+      fetchAllData();
     }
-  }, [fetchAllData, isAuthenticated, withLoading, lang]);
+  }, [fetchAllData, isAuthenticated]);
 
-  const handleRefresh = async (customTitle) => {
-    await withLoading(
-      customTitle || (lang === 'kh' ? 'កំពុងទាញយកទិន្នន័យសមតុល្យ & គណនី...' : 'Refreshing Depository Ledger & Accounts...'),
-      async () => {
-        await fetchAllData();
-      },
-      650,
-      lang === 'kh' ? 'សូមរង់ចាំមួយភ្លែត ប្រព័ន្ធកំពុងធ្វើបច្ចុប្បន្នភាពទិន្នន័យពី Server...' : 'Please wait while the request is processing.'
-    );
+  const handleRefresh = async () => {
+    await fetchAllData();
   };
 
   // Handlers for real transaction & entity updates from database
@@ -274,18 +250,11 @@ export default function App() {
     fetchAllData();
   };
 
-  const handleConfirmLogout = async () => {
+  const handleConfirmLogout = () => {
     setShowLogoutModal(false);
-    await withLoading(
-      lang === 'kh' ? 'កំពុងចាកចេញពីស្ថានីយធនាគារ...' : 'Logging Out from Core Banking Terminal...',
-      async () => {
-        logout();
-        localStorage.removeItem('trustbank_active_tab');
-        window.history.replaceState({ page: 'login' }, '', '/');
-      },
-      500,
-      lang === 'kh' ? 'សូមរង់ចាំមួយភ្លែត ប្រព័ន្ធកំពុងបញ្ចប់សម័យប្រតិបត្តិការ...' : 'Please wait while the request is processing.'
-    );
+    logout();
+    localStorage.removeItem('trustbank_active_tab');
+    window.history.replaceState({ page: 'login' }, '', '/');
     showNotification(lang === 'kh' ? 'បានចាកចេញពីស្ថានីយដោយជោគជ័យ' : 'Signed out from Core Banking Terminal', 'success');
   };
 

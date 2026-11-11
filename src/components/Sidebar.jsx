@@ -22,7 +22,6 @@ export default function Sidebar({
 }) {
   const { t, lang, logout, isAdmin } = useAuth();
   const { theme } = useTheme();
-  const { withLoading } = useLoading();
 
   const handleLogoutClick = () => {
     if (onLogout) {
@@ -34,26 +33,6 @@ export default function Sidebar({
 
   const handleTabClick = (tabId) => {
     setActiveTab(tabId);
-    if (activeTab === tabId) return;
-
-    const titles = {
-      overview: lang === 'kh' ? 'កំពុងទាញយកទិដ្ឋភាពទូទៅនៃសាខា...' : 'Loading Branch Overview & Metrics...',
-      counter: lang === 'kh' ? 'កំពុងដំណើរការបញ្ជរបេឡា...' : 'Loading Teller Counter (Cash & Pay)...',
-      accounts: lang === 'kh' ? 'កំពុងទាញយកគណនីអតិថិជន...' : 'Loading Customer Accounts...',
-      statements: lang === 'kh' ? 'កំពុងទាញយករបាយការណ៍គណនី...' : 'Loading Account Statements...',
-      kyc: lang === 'kh' ? 'កំពុងទាញយកទិន្នន័យ KYC & អតិថិជន...' : 'Loading Customer KYC & Profiles...',
-      users: lang === 'kh' ? 'កំពុងទាញយកអ្នកប្រើប្រាស់ប្រព័ន្ធ...' : 'Loading System Users...',
-      audit: lang === 'kh' ? 'កំពុងទាញយកកំណត់ត្រាត្រួតពិនិត្យ (Audit)...' : 'Loading Audit Trail...',
-      profile: lang === 'kh' ? 'កំពុងទាញយកប្រវត្តិរូបបុគ្គលិក...' : 'Loading Staff Profile & Security...',
-    };
-
-    withLoading(
-      titles[tabId] || (lang === 'kh' ? 'កំពុងដំណើរការទិន្នន័យ...' : 'Loading Request...'),
-      async () => {
-        setActiveTab(tabId);
-      },
-      450
-    );
   };
 
   const tellerOps = [
