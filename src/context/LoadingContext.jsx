@@ -24,18 +24,16 @@ export const LoadingProvider = ({ children }) => {
 
   /**
    * Helper to wrap any async function or action with loading overlay
-   * Executes without artificial delays for maximum performance
+   * Provides a smooth, premium banking animation without sluggish delays
    */
-  const withLoading = useCallback(async (title, asyncFn, minDurationMs = 0, message = 'Please wait while the request is processing.') => {
+  const withLoading = useCallback(async (title, asyncFn, minDurationMs = 280, message = 'Please wait while the request is processing.') => {
     showLoading(title, message);
     const start = Date.now();
     try {
       const result = await asyncFn();
-      if (minDurationMs > 0) {
-        const elapsed = Date.now() - start;
-        if (elapsed < minDurationMs) {
-          await new Promise(r => setTimeout(r, minDurationMs - elapsed));
-        }
+      const elapsed = Date.now() - start;
+      if (elapsed < minDurationMs) {
+        await new Promise(r => setTimeout(r, minDurationMs - elapsed));
       }
       return result;
     } finally {

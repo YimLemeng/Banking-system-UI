@@ -225,8 +225,15 @@ export default function App() {
     }
   }, [fetchAllData, isAuthenticated]);
 
-  const handleRefresh = async () => {
-    await fetchAllData();
+  const handleRefresh = async (customTitle) => {
+    await withLoading(
+      customTitle || (lang === 'kh' ? 'កំពុងទាញយកទិន្នន័យសមតុល្យ & គណនី...' : 'Refreshing Depository Ledger & Accounts...'),
+      async () => {
+        await fetchAllData();
+      },
+      250,
+      lang === 'kh' ? 'សូមរង់ចាំមួយភ្លែត ប្រព័ន្ធកំពុងធ្វើបច្ចុប្បន្នភាពទិន្នន័យពី Server...' : 'Please wait while the request is processing.'
+    );
   };
 
   // Handlers for real transaction & entity updates from database
@@ -250,11 +257,17 @@ export default function App() {
     fetchAllData();
   };
 
-  const handleConfirmLogout = () => {
+  const handleConfirmLogout = async () => {
     setShowLogoutModal(false);
-    logout();
-    localStorage.removeItem('trustbank_active_tab');
-    window.history.replaceState({ page: 'login' }, '', '/');
+    await withLoading(
+      lang === 'kh' ? 'កំពុងចាកចេញពីស្ថានីយធនាគារ...' : 'Logging Out from Core Banking Terminal...',
+      async () => {
+        logout();
+        localStorage.removeItem('trustbank_active_tab');
+        window.history.replaceState({ page: 'login' }, '', '/');
+      },
+      250
+    );
     showNotification(lang === 'kh' ? 'បានចាកចេញពីស្ថានីយដោយជោគជ័យ' : 'Signed out from Core Banking Terminal', 'success');
   };
 

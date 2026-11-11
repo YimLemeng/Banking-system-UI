@@ -17,10 +17,12 @@ import {
 import { authService, parseJwt } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import { useLoading } from '../context/LoadingContext';
 
 export default function LoginPage({ onLoginSuccess, onSkipToDemo }) {
   const { login, lang, setLang, t, authAlert, clearAuthAlert } = useAuth();
   const { currentTheme, setCurrentTheme, themes, theme } = useTheme();
+  const { withLoading } = useLoading();
 
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
@@ -52,42 +54,46 @@ export default function LoginPage({ onLoginSuccess, onSkipToDemo }) {
 
     setError('');
     if (authAlert) clearAuthAlert();
-    setLoading(true);
 
-    try {
-      const res = await authService.login(identifier, password);
-      const data = res.data;
-      const payload = parseJwt(data.token);
-      const userRole = data.role || payload?.role || (data.username?.toLowerCase().includes('admin') ? 'ROLE_ADMIN' : 'ROLE_USER');
-      const isAdminUser = userRole === 'ROLE_ADMIN' || userRole === 'ADMIN';
-      const isTeller = userRole === 'ROLE_USER' || data.username?.toLowerCase() === 'teller';
-      
-      login(data.token, {
-        username: data.username || identifier,
-        role: userRole,
-        fullName: isAdminUser ? 'System Administrator' : (isTeller ? 'Teller Officer' : (data.username || 'Bank Officer')),
-        email: data.email || `${identifier}@trustbank.com`,
-      });
-      if (onLoginSuccess) {
-        onLoginSuccess(
-          lang === 'kh'
-            ? `សូមស្វាគមន៍ការចូលប្រើប្រាស់, ${data.username || identifier}!`
-            : `Welcome back, ${data.username || identifier}!`
-        );
-      }
-    } catch (err) {
-      console.warn('Backend login error:', err);
-      const rawMsg = err.response?.data?.message || '';
-      const isTechnical = rawMsg.includes('unexpected error') || rawMsg.includes('No static resource') || rawMsg.includes('Internal Server Error');
-      
-      if (err.response?.status === 401 || err.response?.status === 400) {
-        setError(!isTechnical && rawMsg ? rawMsg : (lang === 'kh' ? 'ឈ្មោះ ឬលេខសម្ងាត់មិនត្រឹមត្រូវ' : 'Invalid credentials. Please verify your login info.'));
-      } else {
-        setError(!isTechnical && rawMsg ? rawMsg : (lang === 'kh' ? 'មិនអាចតភ្ជាប់ទៅកាន់ម៉ាស៊ីនបម្រើ Server បានទេ។ សូមព្យាយាមម្តងទៀត!' : 'Cannot connect to server. Please try again.'));
-      }
-    } finally {
-      setLoading(false);
-    }
+    await withLoading(
+      lang === 'kh' ? 'កំពុងផ្ទៀងផ្ទាត់គណនីចូលប្រព័ន្ធ...' : 'Authenticating Terminal Officer Credentials...',
+      async () => {
+        try {
+          const res = await authService.login(identifier, password);
+          const data = res.data;
+          const payload = parseJwt(data.token);
+          const userRole = data.role || payload?.role || (data.username?.toLowerCase().includes('admin') ? 'ROLE_ADMIN' : 'ROLE_USER');
+          const isAdminUser = userRole === 'ROLE_ADMIN' || userRole === 'ADMIN';
+          const isTeller = userRole === 'ROLE_USER' || data.username?.toLowerCase() === 'teller';
+          
+          login(data.token, {
+            username: data.username || identifier,
+            role: userRole,
+            fullName: isAdminUser ? 'System Administrator' : (isTeller ? 'Teller Officer' : (data.username || 'Bank Officer')),
+            email: data.email || `${identifier}@trustbank.com`,
+          });
+          if (onLoginSuccess) {
+            onLoginSuccess(
+              lang === 'kh'
+                ? `សូមស្វាគមន៍ការចូលប្រើប្រាស់, ${data.username || identifier}!`
+                : `Welcome back, ${data.username || identifier}!`
+            );
+          }
+        } catch (err) {
+          console.warn('Backend login error:', err);
+          const rawMsg = err.response?.data?.message || '';
+          const isTechnical = rawMsg.includes('unexpected error') || rawMsg.includes('No static resource') || rawMsg.includes('Internal Server Error');
+          
+          if (err.response?.status === 401 || err.response?.status === 400) {
+            setError(!isTechnical && rawMsg ? rawMsg : (lang === 'kh' ? 'ឈ្មោះ ឬលេខសម្ងាត់មិនត្រឹមត្រូវ' : 'Invalid credentials. Please verify your login info.'));
+          } else {
+            setError(!isTechnical && rawMsg ? rawMsg : (lang === 'kh' ? 'មិនអាចតភ្ជាប់ទៅកាន់ម៉ាស៊ីនបម្រើ Server បានទេ។ សូមព្យាយាមម្តងទៀត!' : 'Cannot connect to server. Please try again.'));
+          }
+        }
+      },
+      300,
+      lang === 'kh' ? 'សូមរង់ចាំមួយភ្លែត ប្រព័ន្ធកំពុងដំណើរការ...' : 'Please wait while the request is processing.'
+    );
   };
 
   return (
