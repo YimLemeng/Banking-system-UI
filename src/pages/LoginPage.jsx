@@ -18,6 +18,7 @@ import { authService, parseJwt } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { useLoading } from '../context/LoadingContext';
+import { BankLogo } from '../components/BankLogo';
 
 export default function LoginPage({ onLoginSuccess, onSkipToDemo }) {
   const { login, lang, setLang, t, authAlert, clearAuthAlert } = useAuth();
@@ -180,17 +181,16 @@ export default function LoginPage({ onLoginSuccess, onSkipToDemo }) {
           />
 
           <div className="text-center mb-6">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/25 text-xs font-semibold mb-3">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-              <span>{lang === 'kh' ? 'ប្រព័ន្ធធនាគារស្នូល' : 'Core Banking System'}</span>
+            <div className="flex justify-center mb-4">
+              <BankLogo size={64} />
             </div>
             <h2 className="text-2xl font-extrabold text-white tracking-tight">
-              {lang === 'kh' ? 'ចូលប្រើប្រាស់គណនីបុគ្គលិក' : 'Staff Portal Sign In'}
+              {lang === 'kh' ? 'សូមស្វាគមន៍មកកាន់ប្រព័ន្ធ' : 'Welcome Back'}
             </h2>
-            <p className="text-xs text-slate-400 mt-1">
+            <p className="text-xs text-slate-400 mt-1.5">
               {lang === 'kh' 
-                ? 'សូមបញ្ចូលព័ត៌មានគណនីរបស់អ្នកដើម្បីចូលប្រើប្រាស់ស្ថានីយ' 
-                : 'Enter your credentials to access the banking terminal'}
+                ? 'ចូលប្រើប្រាស់ប្រព័ន្ធធនាគារស្នូល TRUST BANK' 
+                : 'Sign in to your Core Banking System'}
             </p>
           </div>
 
@@ -211,7 +211,7 @@ export default function LoginPage({ onLoginSuccess, onSkipToDemo }) {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                {lang === 'kh' ? 'ឈ្មោះអ្នកប្រើប្រាស់ / អ៊ីមែល / លេខទូរស័ព្ទ' : 'Username, Email or Phone'}
+                {lang === 'kh' ? 'ឈ្មោះអ្នកប្រើប្រាស់ ឬ អ៊ីមែល' : 'Username or Email'}
               </label>
               <div className="relative">
                 <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
@@ -220,7 +220,7 @@ export default function LoginPage({ onLoginSuccess, onSkipToDemo }) {
                   required
                   value={identifier}
                   onChange={(e) => setIdentifier(e.target.value)}
-                  placeholder={lang === 'kh' ? 'ឈ្មោះ ឬ លេខទូរស័ព្ទ' : 'Enter username or phone'}
+                  placeholder={lang === 'kh' ? 'ឧទាហរណ៍៖ admin ឬ teller' : 'e.g. admin or teller'}
                   className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-700/80 text-white text-sm focus:outline-none focus:border-blue-500 font-mono transition-colors"
                 />
               </div>
