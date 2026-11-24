@@ -10,7 +10,6 @@ Production-grade, enterprise core banking terminal web application engineered wi
 
 > 🌐 **Live Web Application**: [https://banking-system.yimlemeng.workers.dev](https://banking-system.yimlemeng.workers.dev)  
 > ⚙️ **Backend REST API Repository**: [https://github.com/YimLemeng/Banking-system](https://github.com/YimLemeng/Banking-system)  
-> 📡 **Live API Base URL**: `https://lemeng-banking-api.duckdns.org/api/v1`  
 > 👤 **Default Terminal Credentials**: `admin` / `admin123` (Administrator) • `teller` / `teller123` (Teller)
 
 ---
@@ -82,7 +81,7 @@ The frontend seamlessly connects to the Spring Boot Core Banking backend via **A
 ### Prerequisites
 - **Node.js**: `v18.0.0` or higher
 - **npm**: `v9.0.0` or higher
-- **Backend API**: Running locally on `http://localhost:8080` or via Cloud VPS at `https://lemeng-banking-api.duckdns.org/api/v1`
+- **Backend API**: Running locally on `http://localhost:8080` (or remote Spring Boot backend)
 
 ### 1. Clone & Install
 ```bash
@@ -97,11 +96,8 @@ npm install
 ### 2. Environment Configuration
 Create or configure `.env` in the root folder:
 ```env
-# Connect to Cloud VPS backend (Default)
-VITE_API_BASE_URL=https://lemeng-banking-api.duckdns.org/api/v1
-
-# Or connect to local Spring Boot backend
-# VITE_API_BASE_URL=http://localhost:8080/api/v1
+# Backend REST API Base URL
+VITE_API_BASE_URL=http://localhost:8080/api/v1
 ```
 
 ### 3. Launch Development Server
