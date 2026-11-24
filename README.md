@@ -6,7 +6,7 @@
 [![License](https://img.shields.io/badge/License-MIT-emerald.svg)](LICENSE)
 [![NBC Compliance](https://img.shields.io/badge/NBC%20Licence-%230492-blue.svg)](https://www.nbc.gov.kh)
 
-Production-grade, enterprise core banking terminal web application engineered with **React.js**, **Tailwind CSS**, and **AdminLTE 4** design principles. Designed for commercial bank branch operations, treasury management, customer KYC onboarding, over-the-counter teller counter settlements, and regulatory audit compliance with full bilingual **Khmer (ភាសាខ្មែរ)** & **English (EN)** localization.
+Production-grade, enterprise core banking terminal web application engineered with **React.js** and **Tailwind CSS**. Designed for commercial bank branch operations, treasury management, customer KYC onboarding, over-the-counter teller counter settlements, and regulatory audit compliance with full bilingual **Khmer (ភាសាខ្មែរ)** & **English (EN)** localization.
 
 > 🌐 **Live Web Application**: [https://banking-system.yimlemeng.workers.dev](https://banking-system.yimlemeng.workers.dev)  
 > ⚙️ **Backend REST API Repository**: [https://github.com/YimLemeng/Banking-system](https://github.com/YimLemeng/Banking-system)  
@@ -47,7 +47,7 @@ Dedicated print media system (`@media print`) that transforms web data tables in
 - Context-aware bilingual status messages for operations like `កំពុងទាញយកទិន្នន័យអ្នកប្រើប្រាស់ប្រព័ន្ធ...` and `Refreshing Depository Ledger & Accounts...`.
 - Minimum smooth duration handling to avoid flickering on ultra-fast network responses.
 
-### 4. AdminLTE 4 Table Pagination (`TablePagination`)
+### 4. Enterprise Table Pagination (`TablePagination`)
 - Standardized enterprise data table footer component.
 - Selectable page sizing (`5`, `10`, `25`, `50`, `100` entries per page).
 - Accessible navigation buttons (First, Previous, Next, Last) with current index range display.
@@ -133,7 +133,7 @@ banking-frontend/
 │   │   ├── LoadingOverlay.jsx     # Dual-ring animated loading modal
 │   │   ├── OfficialReportPrint.jsx# NBC A4 official bank report print layout
 │   │   ├── QuickActionCard.jsx    # Dashboard counter action shortcuts
-│   │   ├── Sidebar.jsx            # AdminLTE 4 collapsible sidebar
+│   │   ├── Sidebar.jsx            # Collapsible navigation sidebar
 │   │   ├── StatCard.jsx           # KPI metrics card with trend indicators
 │   │   ├── TablePagination.jsx    # Enterprise data table pagination
 │   │   └── Toast.jsx              # System status alert notifications
