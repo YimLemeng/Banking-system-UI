@@ -2,20 +2,18 @@ import React, { useState } from 'react';
 import { 
   KeyRound, 
   CheckCircle2, 
-  ShieldCheck,
-  User,
-  Mail,
-  Phone,
-  Building2,
-  Terminal,
-  Lock,
-  Eye,
-  EyeOff,
-  AlertCircle,
-  Loader2,
-  BadgeCheck,
-  ShieldAlert,
-  Sparkles
+  ShieldCheck, 
+  User, 
+  Mail, 
+  Phone, 
+  Building2, 
+  Terminal, 
+  Lock, 
+  Eye, 
+  EyeOff, 
+  AlertCircle, 
+  Loader2, 
+  BadgeCheck 
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
@@ -80,13 +78,12 @@ export default function StaffProfile({ onNotify }) {
         onNotify(successMsg, 'success');
       }
 
-      // Reset form fields
+      // Reset form
       setCurrentPassword('');
       setNewPassword('');
       setConfirmNewPassword('');
     } catch (err) {
-      console.error('Change password failed:', err);
-      const errMsg = err.response?.data?.message || (lang === 'kh' ? 'បរាជ័យក្នុងការប្តូរលេខសម្ងាត់ សូមពិនិត្យលេខសម្ងាត់បច្ចុប្បន្ន' : 'Failed to change password. Please verify current password.');
+      const errMsg = err.response?.data?.message || (lang === 'kh' ? 'ការផ្លាស់ប្តូរលេខសម្ងាត់បរាជ័យ។ សូមពិនិត្យលេខសម្ងាត់បច្ចុប្បន្នរបស់អ្នក។' : 'Failed to change password. Please check your current password.');
       setError(errMsg);
       if (onNotify) {
         onNotify(errMsg, 'error');
@@ -96,117 +93,105 @@ export default function StaffProfile({ onNotify }) {
     }
   };
 
-  const displayName = user?.fullName || (isAdmin ? 'System Administrator' : user?.username || 'Bank Officer');
-  const roleName = isAdmin ? 'SYSTEM ADMINISTRATOR' : (user?.role?.replace('ROLE_', '') || 'BANK TELLER');
-  const emailDisplay = user?.email || (user?.username === 'admin' ? 'admin@banking.com' : `${user?.username || 'officer'}@trustbank.kh`);
-  const phoneDisplay = user?.phoneNumber || '012 345 678';
-  const terminalId = isAdmin ? 'TB-0492' : 'TB-0104';
-  const branchName = 'Head Office (Phnom Penh Main Branch)';
+  const displayName = user?.fullName || (user?.username ? user.username.toUpperCase() : 'Administrator');
+  const roleName = (user?.role || '').replace('ROLE_', '').toUpperCase() || 'STAFF';
+  const emailDisplay = user?.email || `${user?.username || 'admin'}@trustbank.com`;
+  const phoneDisplay = user?.phoneNumber || '+855 (0) 23 999 888';
+  const branchName = user?.branch || 'Head Office (Phnom Penh)';
+  const terminalId = user?.terminalId || 'TB-0492';
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto pb-16 pt-2">
-      {/* Top Header */}
-      <div>
-        <h1 className="text-2xl font-extrabold text-white tracking-tight flex items-center gap-2.5">
-          <ShieldCheck className="w-6 h-6 text-blue-400" />
-          <span>{lang === 'kh' ? 'ប្រវត្តិរូប និងសុវត្ថិភាពគណនី' : 'Staff Profile & Security'}</span>
+    <div className="space-y-4 pb-8">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <h1 className="text-2xl font-semibold text-gray-800 tracking-tight">
+          {lang === 'kh' ? 'ប្រវត្តិរូប និងសុវត្ថិភាពបុគ្គលិក' : 'Staff Profile & Security'}
         </h1>
-        <p className="text-xs text-slate-400 mt-1">
-          {lang === 'kh'
-            ? 'គ្រប់គ្រងព័ត៌មានអត្តសញ្ញាណបុគ្គលិក កម្រិតសិទ្ធិប្រើប្រាស់ប្រព័ន្ធ និងផ្លាស់ប្តូរលេខសម្ងាត់សុវត្ថិភាព'
-            : 'Officer identity profile, terminal privileges, and cryptographic credential management'}
-        </p>
       </div>
 
-      {/* Grid: Profile Card on left/top, Change Password on right/bottom */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      {/* Grid: Profile Card on left, Change Password on right */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
         {/* Profile Card (5 Cols on Desktop) */}
-        <div className="lg:col-span-5 space-y-6">
-          <div className="glass-panel rounded-2xl p-6 border border-slate-800/80 shadow-2xl relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl pointer-events-none" />
-
+        <div className="lg:col-span-5 space-y-5">
+          <div className="bg-white rounded-lg border border-gray-200 shadow-xs p-6 relative overflow-hidden">
             {/* Profile Header Block */}
-            <div className="flex flex-col items-center text-center pb-6 border-b border-slate-800/80">
+            <div className="flex flex-col items-center text-center pb-5 border-b border-gray-100">
               <div className="relative mb-3">
-                <div className={`w-20 h-20 rounded-2xl flex items-center justify-center text-white text-3xl font-black shadow-xl border ${
+                <div className={`w-18 h-18 rounded-full flex items-center justify-center text-white text-2xl font-black shadow-xs border-2 border-white ${
                   isAdmin 
-                    ? 'bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-500 border-blue-400/40 shadow-blue-500/25'
-                    : 'bg-gradient-to-tr from-emerald-600 via-teal-600 to-cyan-600 border-emerald-400/40 shadow-emerald-500/25'
+                    ? 'bg-blue-600' 
+                    : 'bg-emerald-600'
                 }`}>
                   {displayName.charAt(0).toUpperCase()}
                 </div>
-                <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-emerald-400 border-2 border-[#090e1a] flex items-center justify-center shadow-md" title="Online">
-                  <CheckCircle2 className="w-3 h-3 text-[#090e1a]" />
-                </div>
+                <div className="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-emerald-500 border-2 border-white" title="Online" />
               </div>
 
-              <h2 className="text-lg font-bold text-white tracking-wide">
+              <h2 className="text-base font-bold text-gray-800 tracking-wide">
                 {displayName}
               </h2>
-              <p className="text-xs text-slate-400 font-mono mt-0.5">
+              <p className="text-xs text-gray-400 font-mono mt-0.5">
                 @{user?.username || 'admin'}
               </p>
 
-              <div className="mt-3">
-                <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-extrabold tracking-wider uppercase border shadow-sm ${
-                  isAdmin
-                    ? 'bg-amber-500/15 text-amber-300 border-amber-500/40'
-                    : 'bg-blue-500/15 text-blue-300 border-blue-500/40'
+              <div className="mt-2.5">
+                <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold text-white ${
+                  isAdmin ? 'bg-amber-500' : 'bg-blue-600'
                 }`}>
-                  <BadgeCheck className="w-3.5 h-3.5" />
+                  <BadgeCheck className="w-3 h-3" />
                   <span>{roleName}</span>
                 </span>
               </div>
             </div>
 
             {/* Details List */}
-            <div className="pt-5 space-y-3.5 text-xs">
-              <div className="flex items-center justify-between py-1 border-b border-slate-800/40">
-                <span className="text-slate-400 flex items-center gap-2">
-                  <Mail className="w-3.5 h-3.5 text-slate-500" />
+            <div className="pt-4 space-y-3 text-xs">
+              <div className="flex items-center justify-between py-1 border-b border-gray-100">
+                <span className="text-gray-500 flex items-center gap-2">
+                  <Mail className="w-3.5 h-3.5 text-gray-400" />
                   <span>{lang === 'kh' ? 'អ៊ីមែល' : 'Email Address'}</span>
                 </span>
-                <span className="text-slate-200 font-medium font-mono text-[11px] truncate max-w-[180px]">
+                <span className="text-gray-800 font-medium font-mono text-[11px] truncate max-w-[180px]">
                   {emailDisplay}
                 </span>
               </div>
 
-              <div className="flex items-center justify-between py-1 border-b border-slate-800/40">
-                <span className="text-slate-400 flex items-center gap-2">
-                  <Phone className="w-3.5 h-3.5 text-slate-500" />
+              <div className="flex items-center justify-between py-1 border-b border-gray-100">
+                <span className="text-gray-500 flex items-center gap-2">
+                  <Phone className="w-3.5 h-3.5 text-gray-400" />
                   <span>{lang === 'kh' ? 'លេខទូរស័ព្ទ' : 'Phone Number'}</span>
                 </span>
-                <span className="text-slate-200 font-medium font-mono text-[11px]">
+                <span className="text-gray-800 font-medium font-mono text-[11px]">
                   {phoneDisplay}
                 </span>
               </div>
 
-              <div className="flex items-center justify-between py-1 border-b border-slate-800/40">
-                <span className="text-slate-400 flex items-center gap-2">
-                  <Terminal className="w-3.5 h-3.5 text-slate-500" />
+              <div className="flex items-center justify-between py-1 border-b border-gray-100">
+                <span className="text-gray-500 flex items-center gap-2">
+                  <Terminal className="w-3.5 h-3.5 text-gray-400" />
                   <span>{lang === 'kh' ? 'លេខស្ថានីយ' : 'Terminal ID'}</span>
                 </span>
-                <span className="text-cyan-400 font-semibold font-mono text-[11px]">
+                <span className="text-blue-600 font-semibold font-mono text-[11px]">
                   #{terminalId}
                 </span>
               </div>
 
-              <div className="flex items-center justify-between py-1 border-b border-slate-800/40">
-                <span className="text-slate-400 flex items-center gap-2">
-                  <Building2 className="w-3.5 h-3.5 text-slate-500" />
+              <div className="flex items-center justify-between py-1 border-b border-gray-100">
+                <span className="text-gray-500 flex items-center gap-2">
+                  <Building2 className="w-3.5 h-3.5 text-gray-400" />
                   <span>{lang === 'kh' ? 'សាខា' : 'Branch'}</span>
                 </span>
-                <span className="text-slate-200 font-medium truncate max-w-[170px]" title={branchName}>
+                <span className="text-gray-800 font-medium truncate max-w-[170px]" title={branchName}>
                   {branchName}
                 </span>
               </div>
 
               <div className="flex items-center justify-between py-1">
-                <span className="text-slate-400 flex items-center gap-2">
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                <span className="text-gray-500 flex items-center gap-2">
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
                   <span>{lang === 'kh' ? 'សុវត្ថិភាព' : 'Security Level'}</span>
                 </span>
-                <span className="text-emerald-400 font-bold">
+                <span className="text-emerald-700 font-semibold">
                   {isAdmin ? 'Tier 1 • Admin Access' : 'Tier 2 • Teller Access'}
                 </span>
               </div>
@@ -216,16 +201,16 @@ export default function StaffProfile({ onNotify }) {
 
         {/* Change Password Form (7 Cols on Desktop) */}
         <div className="lg:col-span-7">
-          <div className="glass-panel rounded-2xl p-6 sm:p-7 border border-slate-800/80 shadow-2xl relative">
-            <div className="flex items-center gap-3 pb-4 border-b border-slate-800/80">
-              <div className="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0">
-                <KeyRound className="w-5 h-5" />
+          <div className="bg-white rounded-lg border border-gray-200 shadow-xs p-6 relative">
+            <div className="flex items-center gap-3 pb-4 border-b border-gray-100">
+              <div className="w-9 h-9 rounded-lg bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600 shrink-0">
+                <KeyRound className="w-4 h-4" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-white">
+                <h3 className="text-base font-semibold text-gray-800">
                   {lang === 'kh' ? 'ផ្លាស់ប្តូរលេខសម្ងាត់ថ្មី' : 'Change Security Password'}
                 </h3>
-                <p className="text-xs text-slate-400 mt-0.5">
+                <p className="text-xs text-gray-500 mt-0.5">
                   {lang === 'kh'
                     ? 'កំណត់លេខសម្ងាត់ថ្មីសម្រាប់គណនីរបស់អ្នកដើម្បីបង្កើនសុវត្ថិភាព'
                     : 'Update your officer account authentication key with high-entropy pass'}
@@ -235,40 +220,40 @@ export default function StaffProfile({ onNotify }) {
 
             {/* Error Message */}
             {error && (
-              <div className="mt-5 p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2.5 animate-fadeIn">
-                <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
+              <div className="mt-4 p-3 rounded-md bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2.5">
+                <AlertCircle className="w-4 h-4 text-rose-500 shrink-0" />
                 <span>{error}</span>
               </div>
             )}
 
             {/* Success Message */}
             {success && (
-              <div className="mt-5 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs flex items-center gap-2.5 animate-fadeIn">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+              <div className="mt-4 p-3 rounded-md bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs flex items-center gap-2.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
                 <span>{success}</span>
               </div>
             )}
 
-            <form onSubmit={handlePasswordSubmit} className="mt-6 space-y-4">
+            <form onSubmit={handlePasswordSubmit} className="mt-5 space-y-4">
               {/* Current Password */}
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                  {lang === 'kh' ? 'លេខសម្ងាត់បច្ចុប្បន្ន' : 'Current Password'} <span className="text-rose-400">*</span>
+                <label className="block text-xs font-semibold text-gray-700 mb-1">
+                  {lang === 'kh' ? 'លេខសម្ងាត់បច្ចុប្បន្ន' : 'Current Password'} <span className="text-rose-500">*</span>
                 </label>
                 <div className="relative">
-                  <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+                  <Lock className="w-4 h-4 text-gray-400 absolute left-3 top-2.5" />
                   <input
                     type={showCurrent ? 'text' : 'password'}
                     required
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-slate-900/90 border border-slate-700/80 text-white text-sm focus:outline-none focus:border-blue-500 font-mono transition-colors"
+                    className="w-full pl-9 pr-9 py-2 rounded-md bg-white border border-gray-300 text-gray-800 text-xs focus:outline-none focus:border-blue-500 font-mono transition-colors"
                   />
                   <button
                     type="button"
                     onClick={() => setShowCurrent(!showCurrent)}
-                    className="absolute right-3.5 top-3 text-slate-400 hover:text-slate-200 transition-colors"
+                    className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600 transition-colors"
                   >
                     {showCurrent ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -277,11 +262,11 @@ export default function StaffProfile({ onNotify }) {
 
               {/* New Password */}
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                  {lang === 'kh' ? 'លេខសម្ងាត់ថ្មី (យ៉ាងតិច ៦ តួអក្សរ)' : 'New Password (min 6 characters)'} <span className="text-rose-400">*</span>
+                <label className="block text-xs font-semibold text-gray-700 mb-1">
+                  {lang === 'kh' ? 'លេខសម្ងាត់ថ្មី (យ៉ាងតិច ៦ តួអក្សរ)' : 'New Password (min 6 characters)'} <span className="text-rose-500">*</span>
                 </label>
                 <div className="relative">
-                  <KeyRound className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+                  <KeyRound className="w-4 h-4 text-gray-400 absolute left-3 top-2.5" />
                   <input
                     type={showNew ? 'text' : 'password'}
                     required
@@ -289,12 +274,12 @@ export default function StaffProfile({ onNotify }) {
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-slate-900/90 border border-slate-700/80 text-white text-sm focus:outline-none focus:border-blue-500 font-mono transition-colors"
+                    className="w-full pl-9 pr-9 py-2 rounded-md bg-white border border-gray-300 text-gray-800 text-xs focus:outline-none focus:border-blue-500 font-mono transition-colors"
                   />
                   <button
                     type="button"
                     onClick={() => setShowNew(!showNew)}
-                    className="absolute right-3.5 top-3 text-slate-400 hover:text-slate-200 transition-colors"
+                    className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600 transition-colors"
                   >
                     {showNew ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -303,11 +288,11 @@ export default function StaffProfile({ onNotify }) {
 
               {/* Confirm New Password */}
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                  {lang === 'kh' ? 'ផ្ទៀងផ្ទាត់លេខសម្ងាត់ថ្មី' : 'Confirm New Password'} <span className="text-rose-400">*</span>
+                <label className="block text-xs font-semibold text-gray-700 mb-1">
+                  {lang === 'kh' ? 'ផ្ទៀងផ្ទាត់លេខសម្ងាត់ថ្មី' : 'Confirm New Password'} <span className="text-rose-500">*</span>
                 </label>
                 <div className="relative">
-                  <ShieldCheck className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+                  <KeyRound className="w-4 h-4 text-gray-400 absolute left-3 top-2.5" />
                   <input
                     type={showConfirm ? 'text' : 'password'}
                     required
@@ -315,30 +300,15 @@ export default function StaffProfile({ onNotify }) {
                     value={confirmNewPassword}
                     onChange={(e) => setConfirmNewPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-slate-900/90 border border-slate-700/80 text-white text-sm focus:outline-none focus:border-blue-500 font-mono transition-colors"
+                    className="w-full pl-9 pr-9 py-2 rounded-md bg-white border border-gray-300 text-gray-800 text-xs focus:outline-none focus:border-blue-500 font-mono transition-colors"
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirm(!showConfirm)}
-                    className="absolute right-3.5 top-3 text-slate-400 hover:text-slate-200 transition-colors"
+                    className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600 transition-colors"
                   >
                     {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
-                </div>
-              </div>
-
-              {/* Password Checklist Helper */}
-              <div className="p-3 rounded-xl bg-slate-900/60 border border-slate-800/80 text-[11px] space-y-1.5">
-                <div className="font-semibold text-slate-400">
-                  {lang === 'kh' ? 'លក្ខខណ្ឌសុវត្ថិភាពលេខសម្ងាត់៖' : 'Password Security Rules:'}
-                </div>
-                <div className={`flex items-center gap-1.5 ${newPassword.length >= 6 ? 'text-emerald-400' : 'text-slate-400'}`}>
-                  <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
-                  <span>{lang === 'kh' ? 'មានយ៉ាងតិច ៦ តួអក្សរ' : 'At least 6 characters in length'}</span>
-                </div>
-                <div className={`flex items-center gap-1.5 ${newPassword && confirmNewPassword && newPassword === confirmNewPassword ? 'text-emerald-400' : 'text-slate-400'}`}>
-                  <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
-                  <span>{lang === 'kh' ? 'លេខសម្ងាត់ទាំងពីរដូចគ្នា' : 'New password and confirm match'}</span>
                 </div>
               </div>
 
@@ -347,21 +317,15 @@ export default function StaffProfile({ onNotify }) {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-3 rounded-xl text-xs font-bold text-white shadow-xl transition-all flex items-center justify-center gap-2 group cursor-pointer disabled:opacity-60"
-                  style={{
-                    background: `linear-gradient(135deg, ${theme.primary}, ${theme.primaryLight})`,
-                  }}
+                  className="w-full py-2.5 px-4 rounded-md text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors shadow-2xs flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                 >
                   {loading ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>{lang === 'kh' ? 'កំពុងធ្វើបច្ចុប្បន្នភាព...' : 'Updating Password...'}</span>
+                      <span>{lang === 'kh' ? 'កំពុងផ្លាស់ប្តូរលេខសម្ងាត់...' : 'Updating Password...'}</span>
                     </>
                   ) : (
-                    <>
-                      <KeyRound className="w-4 h-4 transition-transform group-hover:rotate-45" />
-                      <span>{lang === 'kh' ? 'ផ្លាស់ប្តូរលេខសម្ងាត់' : 'Save New Password'}</span>
-                    </>
+                    <span>{lang === 'kh' ? 'ធ្វើបច្ចុប្បន្នភាពលេខសម្ងាត់' : 'Update Credentials'}</span>
                   )}
                 </button>
               </div>

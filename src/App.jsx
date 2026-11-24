@@ -24,7 +24,7 @@ import LoginPage from './pages/LoginPage';
 import SystemUsers from './pages/SystemUsers';
 import StaffProfile from './pages/StaffProfile';
 
-import { accountService, customerService, auditService } from './services/api';
+import { accountService, customerService, auditService, transactionService } from './services/api';
 import { useAuth } from './context/AuthContext';
 import { useLoading } from './context/LoadingContext';
 
@@ -96,6 +96,7 @@ export default function App() {
   const [accounts, setAccounts] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [auditLogs, setAuditLogs] = useState([]);
+  const [transactions, setTransactions] = useState([]);
   // Dynamic live stats calculated from real database
   const stats = useMemo(() => {
     const usdVault = accounts.reduce((sum, a) => sum + (parseFloat(a.balance) || 0), 0);
@@ -178,6 +179,7 @@ export default function App() {
       const requests = [
         accountService.getAll(0, 100),
         customerService.getAll('', 0, 100),
+        transactionService.search({ page: 0, size: 100 }),
       ];
 
       // Only fetch audit logs if admin to prevent 403 Forbidden latency
@@ -186,7 +188,7 @@ export default function App() {
       }
 
       const results = await Promise.allSettled(requests);
-      const [accResult, custResult, auditResult] = results;
+      const [accResult, custResult, txResult, auditResult] = results;
 
       if (accResult && accResult.status === 'fulfilled') {
         const accContent = accResult.value?.data?.content || accResult.value?.data;
@@ -201,6 +203,13 @@ export default function App() {
         if (Array.isArray(custContent)) {
           setCustomers(custContent);
           onlineStatus = true;
+        }
+      }
+
+      if (txResult && txResult.status === 'fulfilled') {
+        const txContent = txResult.value?.data?.content || txResult.value?.data;
+        if (Array.isArray(txContent)) {
+          setTransactions(txContent);
         }
       }
 
@@ -231,7 +240,7 @@ export default function App() {
       async () => {
         await fetchAllData();
       },
-      250,
+      500,
       lang === 'kh' ? 'សូមរង់ចាំមួយភ្លែត ប្រព័ន្ធកំពុងធ្វើបច្ចុប្បន្នភាពទិន្នន័យពី Server...' : 'Please wait while the request is processing.'
     );
   };
@@ -286,13 +295,13 @@ export default function App() {
   }
 
   return (
-    <div className="h-screen max-h-screen bg-[#070a13] text-slate-100 flex flex-col font-sans overflow-hidden relative">
+    <div className="h-screen max-h-screen bg-[#f4f6f9] text-slate-800 flex flex-col font-sans overflow-hidden relative">
       {/* Top Fixed Header with Sidebar Toggle */}
       <Header 
         isOnline={isOnline}
         sidebarCollapsed={sidebarCollapsed}
         onToggleSidebar={toggleSidebar}
-        onOpenProfile={() => switchTab('profile')}
+        onOpenProfile={() => handleTabChange('profile')}
       />
 
       {/* Top Loading Progress Bar */}
@@ -308,6 +317,8 @@ export default function App() {
           isCollapsed={sidebarCollapsed}
           onToggleCollapse={toggleSidebar}
           onLogout={() => setShowLogoutModal(true)}
+          tellerOperation={tellerState.operation}
+          onSelectTellerOp={(op) => navigateToTeller(op)}
         />
 
         {/* Main Content Area */}
@@ -316,6 +327,8 @@ export default function App() {
             <Dashboard
               accounts={accounts}
               customers={customers}
+              transactions={transactions}
+              auditLogs={auditLogs}
               stats={stats}
               loading={loading}
               onRefresh={() => handleRefresh(lang === 'kh' ? 'កំពុងទាញយកទិន្នន័យសមតុល្យ & គណនី...' : 'Refreshing Depository Ledger & Accounts...')}
@@ -332,11 +345,13 @@ export default function App() {
               key={`teller-counter-${tellerResetKey}`}
               accounts={accounts}
               onRefresh={() => {
-                setTellerState({ operation: 'DEPOSIT', sourceAccount: '', targetAccount: '' });
+                setTellerState(prev => ({ ...prev, sourceAccount: '', targetAccount: '' }));
                 setTellerResetKey((prev) => prev + 1);
                 handleRefresh(lang === 'kh' ? 'កំពុងទាញយកទិន្នន័យសមតុល្យ & គណនី...' : 'Refreshing Depository Ledger & Accounts...');
               }}
               onSuccess={handleTransactionSuccess}
+              currentOperation={tellerState.operation}
+              onOperationChange={(op) => setTellerState(prev => ({ ...prev, operation: op }))}
               initialOperation={tellerState.operation}
               initialSourceAccount={tellerState.sourceAccount}
               initialTargetAccount={tellerState.targetAccount}
@@ -399,6 +414,16 @@ export default function App() {
           )}
 
           {activeTab === 'profile' && <StaffProfile onNotify={showNotification} />}
+
+          {/* AdminLTE Bottom Footer */}
+          <footer className="mt-8 pt-4 pb-3 border-t border-gray-200 text-xs text-gray-500 flex flex-col sm:flex-row items-center justify-between gap-2">
+            <div>
+              <strong>Copyright &copy; 2014-2026 <span className="text-blue-600 font-semibold">Trust Bank Core</span>.</strong> All rights reserved.
+            </div>
+            <div className="text-gray-400">
+              Core Banking Terminal • <span className="font-mono text-gray-500">v4.0.0</span>
+            </div>
+          </footer>
         </main>
       </div>
 

@@ -37,8 +37,8 @@ export default {
         }
       },
       fontFamily: {
-        sans: ['Plus Jakarta Sans', 'Kantumruy Pro', 'Inter', 'system-ui', 'sans-serif'],
-        khmer: ['Kantumruy Pro', 'system-ui', 'sans-serif'],
+        sans: ['"Khmer OS Battambang"', 'Battambang', 'Plus Jakarta Sans', 'system-ui', 'sans-serif'],
+        khmer: ['"Khmer OS Battambang"', 'Battambang', 'system-ui', 'sans-serif'],
       }
     },
   },

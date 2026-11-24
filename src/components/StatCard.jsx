@@ -1,48 +1,91 @@
 import React from 'react';
-import { ArrowUpRight, TrendingUp } from 'lucide-react';
-import { useTheme } from '../context/ThemeContext';
+import { ArrowUpRight, ArrowRight, ExternalLink } from 'lucide-react';
 
-export default function StatCard({ title, value, subtitle, icon: Icon, badge, color = 'blue' }) {
-  const { theme } = useTheme();
+export default function StatCard({ 
+  title, 
+  value, 
+  subtitle, 
+  icon: Icon, 
+  badge, 
+  color = 'blue',
+  onClickMore,
+  footerText = 'More info'
+}) {
+  const colorConfigs = {
+    blue: {
+      bg: 'bg-[#007bff]',
+      text: 'text-white',
+      subtext: 'text-white/80',
+      watermark: 'text-white/20',
+      footerBg: 'bg-black/15 hover:bg-black/25',
+      footerText: 'text-white/95',
+    },
+    green: {
+      bg: 'bg-[#28a745]',
+      text: 'text-white',
+      subtext: 'text-white/80',
+      watermark: 'text-white/20',
+      footerBg: 'bg-black/15 hover:bg-black/25',
+      footerText: 'text-white/95',
+    },
+    yellow: {
+      bg: 'bg-[#ffc107]',
+      text: 'text-gray-900',
+      subtext: 'text-gray-800/80',
+      watermark: 'text-black/15',
+      footerBg: 'bg-black/10 hover:bg-black/20',
+      footerText: 'text-gray-900',
+    },
+    red: {
+      bg: 'bg-[#dc3545]',
+      text: 'text-white',
+      subtext: 'text-white/80',
+      watermark: 'text-white/20',
+      footerBg: 'bg-black/15 hover:bg-black/25',
+      footerText: 'text-white/95',
+    },
+  };
+
+  const cfg = colorConfigs[color] || colorConfigs.blue;
 
   return (
-    <div className="glass-panel glass-panel-hover rounded-2xl p-5 relative overflow-hidden group">
-      {/* Background radial highlight */}
-      <div 
-        className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full opacity-10 blur-xl group-hover:opacity-20 transition-opacity"
-        style={{ backgroundColor: theme.primaryLight }}
-      />
-
-      <div className="flex items-start justify-between">
-        <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-          {title}
-        </span>
-        <div 
-          className="w-10 h-10 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110 shadow-md"
-          style={{ 
-            backgroundColor: `${theme.primaryLight}15`, 
-            color: theme.primaryLight,
-            border: `1px solid ${theme.primaryLight}30` 
-          }}
-        >
-          <Icon className="w-5 h-5" />
+    <div className={`rounded-lg shadow-xs overflow-hidden relative ${cfg.bg} ${cfg.text} flex flex-col justify-between transition-transform hover:-translate-y-0.5 duration-200 group`}>
+      {/* Background Watermark Icon (AdminLTE 4 signature watermark) */}
+      {Icon && (
+        <div className={`absolute top-2 right-3 pointer-events-none transition-transform group-hover:scale-110 duration-300 ${cfg.watermark}`}>
+          <Icon className="w-16 h-16 stroke-[1.2]" />
         </div>
-      </div>
+      )}
 
-      <div className="mt-4">
-        <div className="text-2xl font-extrabold text-white tracking-tight mono-number">
+      {/* Main Content Area */}
+      <div className="p-4 relative z-10">
+        <div className="text-3xl font-extrabold tracking-tight font-sans drop-shadow-xs">
           {value}
         </div>
-        <div className="flex items-center gap-1.5 mt-2 text-xs">
-          {badge && (
-            <span className="flex items-center gap-0.5 text-emerald-400 font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded-md border border-emerald-500/20">
-              <ArrowUpRight className="w-3 h-3" />
-              {badge}
-            </span>
-          )}
-          <span className="text-slate-400 text-[11px] truncate">{subtitle}</span>
+        <div className="text-sm font-medium mt-1 leading-snug drop-shadow-xs">
+          {title}
         </div>
+        {subtitle && (
+          <div className={`text-[11px] font-medium mt-1.5 flex items-center gap-1.5 ${cfg.subtext}`}>
+            {badge && (
+              <span className="px-1.5 py-0.2 rounded text-[10px] font-bold bg-white/25 backdrop-blur-xs">
+                {badge}
+              </span>
+            )}
+            <span className="truncate">{subtitle}</span>
+          </div>
+        )}
       </div>
+
+      {/* Footer Ribbon: More info -> */}
+      <button
+        type="button"
+        onClick={onClickMore}
+        className={`w-full py-1.5 px-3 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer select-none border-t border-black/5 ${cfg.footerBg} ${cfg.footerText}`}
+      >
+        <span>{footerText}</span>
+        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+      </button>
     </div>
   );
 }

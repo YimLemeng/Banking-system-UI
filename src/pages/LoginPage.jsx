@@ -8,11 +8,14 @@ import {
   EyeOff, 
   ShieldCheck, 
   AlertCircle, 
-  Sparkles, 
   ArrowRight,
   Globe2,
   Palette,
-  ChevronDown
+  ChevronDown,
+  Sparkles,
+  Zap,
+  CheckCircle2,
+  Shield
 } from 'lucide-react';
 import { authService, parseJwt } from '../services/api';
 import { useAuth } from '../context/AuthContext';
@@ -45,6 +48,17 @@ export default function LoginPage({ onLoginSuccess, onSkipToDemo }) {
       window.removeEventListener('popstate', handlePopState);
     };
   }, []);
+
+  const fillCredentials = (userType) => {
+    if (userType === 'admin') {
+      setIdentifier('admin');
+      setPassword('admin123');
+    } else {
+      setIdentifier('teller');
+      setPassword('teller123');
+    }
+    setError('');
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -98,99 +112,155 @@ export default function LoginPage({ onLoginSuccess, onSkipToDemo }) {
   };
 
   return (
-    <div className="min-h-screen bg-[#070a13] text-slate-100 flex flex-col justify-between relative overflow-hidden font-sans select-none">
-      {/* Background ambient radial gradients */}
-      <div 
-        className="absolute -top-40 -left-40 w-96 h-96 rounded-full opacity-15 blur-3xl pointer-events-none"
-        style={{ backgroundColor: theme.primaryLight }}
-      />
-      <div 
-        className="absolute -bottom-40 -right-40 w-96 h-96 rounded-full opacity-15 blur-3xl pointer-events-none"
-        style={{ backgroundColor: theme.primaryLight }}
-      />
+    <div className="min-h-screen w-full flex bg-[#0f172a] text-slate-100 font-sans select-none overflow-hidden">
+      {/* LEFT COLUMN: Premium Bank Imagery & Value Proposition (Visible on LG screens) */}
+      <div className="hidden lg:flex lg:w-7/12 relative flex-col justify-between p-12 overflow-hidden">
+        {/* Background Bank Skyscraper Photograph */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center transition-transform duration-1000 scale-105"
+          style={{ backgroundImage: `url('/banking-hero.jpg')` }}
+        />
+        {/* Deep luxury gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-tr from-slate-950 via-slate-900/85 to-blue-950/75 mix-blend-multiply" />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent" />
 
-      {/* Top Bar on Login Screen */}
-      <header className="px-6 py-4 flex items-center justify-between border-b border-slate-800/80 backdrop-blur-md bg-slate-950/40 relative z-20">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-700 via-blue-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/20 border border-blue-400/30">
-            <Building2 className="w-5 h-5 text-white" />
-          </div>
-          <span className="font-extrabold text-base tracking-wider text-white">
-            {t.brandName}
-          </span>
-          <span className="text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded-full bg-blue-500/15 text-blue-400 border border-blue-500/30 hidden sm:inline-flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
-            {t.terminalTitle}
-          </span>
-        </div>
+        {/* Ambient Top Glow */}
+        <div 
+          className="absolute -top-32 -left-32 w-96 h-96 rounded-full opacity-30 blur-3xl pointer-events-none"
+          style={{ backgroundColor: theme.primary }}
+        />
 
-        <div className="flex items-center gap-2.5">
-          {/* Theme Selector */}
-          <div className="relative">
-            <button
-              onClick={() => setShowThemeMenu(!showThemeMenu)}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-slate-900/80 hover:bg-slate-800 text-slate-300 border border-slate-700/60 transition-colors"
-            >
-              <Palette className="w-3.5 h-3.5 text-blue-400" />
-              <span className="capitalize hidden sm:inline">{theme.name}</span>
-              <ChevronDown className="w-3 h-3 text-slate-400" />
-            </button>
-
-            {showThemeMenu && (
-              <div 
-                className="absolute right-0 mt-2 w-48 rounded-xl bg-slate-900 border border-slate-700 shadow-2xl p-1.5 z-50 animate-fadeIn"
-                onMouseLeave={() => setShowThemeMenu(false)}
-              >
-                {Object.values(themes).map((th) => (
-                  <button
-                    key={th.id}
-                    onClick={() => {
-                      setCurrentTheme(th.id);
-                      setShowThemeMenu(false);
-                    }}
-                    className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                      currentTheme === th.id 
-                        ? 'bg-slate-800 text-white' 
-                        : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2">
-                      <span 
-                        className="w-3 h-3 rounded-full" 
-                        style={{ backgroundColor: th.primaryLight }}
-                      />
-                      <span>{lang === 'kh' ? th.nameKh : th.name}</span>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      </header>
-
-      {/* Main Login Card */}
-      <div className="flex-1 flex items-center justify-center p-4 relative z-10 my-6">
-        <div className="w-full max-w-md glass-panel rounded-3xl p-8 border border-slate-700/80 shadow-2xl relative overflow-hidden">
-          {/* Subtle top light bar */}
-          <div 
-            className="absolute top-0 left-0 right-0 h-1.5"
-            style={{
-              background: `linear-gradient(90deg, ${theme.primary}, ${theme.primaryLight}, #6366f1)`
-            }}
-          />
-
-          <div className="text-center mb-6">
-            <div className="flex justify-center mb-4">
-              <BankLogo size={64} />
+        {/* Top Header in Left Column */}
+        <div className="relative z-10 flex items-center gap-3">
+          <BankLogo size={40} />
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="font-extrabold text-lg tracking-wider text-white">
+                {t.brandName || 'TRUST BANK'}
+              </span>
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1 font-khmer">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                {lang === 'kh' ? 'ទទួលស្គាល់ដោយ NBC' : 'NBC Cleared'}
+              </span>
             </div>
-            <h2 className="text-2xl font-extrabold text-white tracking-tight">
-              {lang === 'kh' ? 'សូមស្វាគមន៍មកកាន់ប្រព័ន្ធ' : 'Welcome Back'}
-            </h2>
-            <p className="text-xs text-slate-400 mt-1.5">
+            <p className="text-[11px] text-slate-400 font-medium font-khmer">
               {lang === 'kh' 
-                ? 'ចូលប្រើប្រាស់ប្រព័ន្ធធនាគារស្នូល TRUST BANK' 
-                : 'Sign in to your Core Banking System'}
+                ? 'បណ្តាញធនាគារស្នូល និងទុនបម្រុងជាតិកម្ពុជា' 
+                : 'National Depository & Core Banking Network'}
+            </p>
+          </div>
+        </div>
+
+        {/* Center Hero Copy in Left Column */}
+        <div className="relative z-10 max-w-xl space-y-6 my-auto py-8">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-white/10 text-blue-200 border border-white/15 backdrop-blur-md">
+            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+            <span>{lang === 'kh' ? 'ប្រព័ន្ធធនាគារស្នូលឌីជីថលជំនាន់ថ្មី' : 'Next-Gen Core Depository & Treasury Terminal'}</span>
+          </div>
+
+          <h1 className="text-3xl sm:text-4xl xl:text-5xl font-bold text-white leading-relaxed md:leading-[1.7] tracking-normal font-khmer">
+            {lang === 'kh' ? (
+              <>
+                សុវត្ថិភាពខ្ពស់បំផុតសម្រាប់ <br />
+                <span className="text-blue-400 font-bold inline-block mt-1">
+                  ប្រតិបត្តិការហិរញ្ញវត្ថុ
+                </span>
+              </>
+            ) : (
+              <>
+                Institutional-Grade <br />
+                <span className="text-blue-400 font-bold inline-block mt-1">
+                  Financial Workstation
+                </span>
+              </>
+            )}
+          </h1>
+
+          <p className="text-sm text-slate-300 leading-relaxed max-w-lg font-khmer">
+            {lang === 'kh'
+              ? 'គ្រប់គ្រងលំហូរសាច់ប្រាក់ បញ្ជរបេឡា OTC កំណត់ត្រា KYC និងការទូទាត់ប្រាក់ទូទាំងប្រទេសកម្ពុជាប្រកបដោយតម្លាភាព និងភាពត្រឹមត្រូវខ្ពស់បំផុត។'
+              : 'Seamlessly orchestrate over-the-counter teller deposits, withdrawals, internal transfers, and regulatory compliance audits with real-time National Bank of Cambodia clearing.'}
+          </p>
+
+          {/* Feature Highlights Grid */}
+          <div className="grid grid-cols-2 gap-4 pt-2">
+            <div className="p-3.5 rounded-xl bg-white/5 border border-white/10 backdrop-blur-md">
+              <div className="flex items-center gap-2.5 text-xs font-bold text-white mb-1 font-khmer">
+                <Zap className="w-4 h-4 text-emerald-400" />
+                <span>{lang === 'kh' ? 'ទូទាត់ប្រាក់ភ្លាមៗ' : 'Instant Settlements'}</span>
+              </div>
+              <p className="text-[11px] text-slate-400 font-khmer leading-relaxed">
+                {lang === 'kh' 
+                  ? 'កែសម្រួលសមតុល្យភ្លាមៗ និងបោះពុម្ពបង្កាន់ដៃបេឡា។' 
+                  : 'Live ledger balance adjustments & teller slip printing.'}
+              </p>
+            </div>
+
+            <div className="p-3.5 rounded-xl bg-white/5 border border-white/10 backdrop-blur-md">
+              <div className="flex items-center gap-2.5 text-xs font-bold text-white mb-1 font-khmer">
+                <ShieldCheck className="w-4 h-4 text-blue-400" />
+                <span>{lang === 'kh' ? 'សវនកម្មស្តង់ដារ NBC' : 'NBC Audited Ledger'}</span>
+              </div>
+              <p className="text-[11px] text-slate-400 font-khmer leading-relaxed">
+                {lang === 'kh' 
+                  ? 'កំណត់ត្រាសវនកម្មមិនអាចកែប្រែបាន ១០០% និងគ្រប់គ្រងហានិភ័យ។' 
+                  : '100% immutable audit event trail & risk controls.'}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Status Info in Left Column */}
+        <div className="relative z-10 pt-4 border-t border-white/10 flex items-center justify-between text-xs text-slate-400">
+          <div className="flex items-center gap-2 font-khmer">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+            <span className="font-mono text-[11px]">
+              {lang === 'kh' ? 'ម៉ាស៊ីនមេ #TB-0492 ដំណើរការ' : 'Core Node #TB-0492 Online'}
+            </span>
+          </div>
+          <span className="text-[11px] font-khmer">
+            {lang === 'kh' ? '© ២០១៤–២០២៦ ធនាគារ ត្រាស់ ប៊ែង • រក្សាសិទ្ធិគ្រប់យ៉ាង' : '© 2014-2026 Trust Bank Core. All rights reserved.'}
+          </span>
+        </div>
+      </div>
+
+      {/* RIGHT COLUMN: Modern High-Contrast Login Card */}
+      <div className="w-full lg:w-5/12 flex flex-col justify-between p-6 sm:p-10 lg:p-12 bg-[#0b1120] relative z-20">
+        {/* Top Header Utilities (Lang & Theme) */}
+        <div className="flex items-center justify-between pb-6">
+          <div className="lg:hidden flex items-center gap-2">
+            <BankLogo size={28} />
+            <span className="font-extrabold text-sm text-white tracking-wider">
+              TRUST BANK
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2 ml-auto">
+            {/* Language Switcher */}
+            <button
+              type="button"
+              onClick={() => setLang(lang === 'en' ? 'kh' : 'en')}
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-800/80 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-colors cursor-pointer"
+            >
+              <Globe2 className="w-3.5 h-3.5 text-blue-400" />
+              <span>{lang === 'en' ? 'EN' : 'ខ្មែរ'}</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Main Center Form */}
+        <div className="max-w-md w-full mx-auto my-auto py-6">
+          <div className="mb-6 text-center flex flex-col items-center">
+            <div className="w-14 h-14 rounded-2xl bg-blue-600/10 border border-blue-500/30 flex items-center justify-center mb-4 text-blue-400 shadow-lg shadow-blue-500/10">
+              <KeyRound className="w-7 h-7" />
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-white">
+              {lang === 'kh' ? 'ចូលប្រើប្រាស់ប្រព័ន្ធ' : 'Sign in to Terminal'}
+            </h2>
+            <p className="text-xs text-slate-400 mt-1.5 max-w-sm mx-auto">
+              {lang === 'kh' 
+                ? 'សូមបញ្ចូលឈ្មោះ និងលេខសម្ងាត់របស់មន្ត្រីធនាគារ' 
+                : 'Enter your core banking credentials to access the terminal workstation.'}
             </p>
           </div>
 
@@ -211,39 +281,39 @@ export default function LoginPage({ onLoginSuccess, onSkipToDemo }) {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                {lang === 'kh' ? 'ឈ្មោះអ្នកប្រើប្រាស់ ឬ អ៊ីមែល' : 'Username or Email'}
+                {lang === 'kh' ? 'ឈ្មោះអ្នកប្រើប្រាស់ ឬ អ៊ីមែល' : 'Username or Email'} <span className="text-rose-400">*</span>
               </label>
               <div className="relative">
-                <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+                <User className="w-4 h-4 text-slate-500 absolute left-3.5 top-3" />
                 <input
                   type="text"
                   required
                   value={identifier}
                   onChange={(e) => setIdentifier(e.target.value)}
-                  placeholder={lang === 'kh' ? 'ឧទាហរណ៍៖ admin ឬ teller' : 'e.g. admin or teller'}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-700/80 text-white text-sm focus:outline-none focus:border-blue-500 font-mono transition-colors"
+                  placeholder={lang === 'kh' ? 'បញ្ចូលឈ្មោះអ្នកប្រើប្រាស់ ឬ អ៊ីមែល...' : 'Enter your username or email...'}
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-700/80 text-white text-sm focus:outline-none focus:border-blue-500 font-mono transition-colors shadow-2xs"
                 />
               </div>
             </div>
 
             <div>
               <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                {lang === 'kh' ? 'លេខសម្ងាត់' : 'Password'}
+                {lang === 'kh' ? 'លេខសម្ងាត់' : 'Password'} <span className="text-rose-400">*</span>
               </label>
               <div className="relative">
-                <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+                <Lock className="w-4 h-4 text-slate-500 absolute left-3.5 top-3" />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-slate-900/90 border border-slate-700/80 text-white text-sm focus:outline-none focus:border-blue-500 transition-colors font-mono"
+                  className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-slate-900/90 border border-slate-700/80 text-white text-sm focus:outline-none focus:border-blue-500 transition-colors font-mono shadow-2xs"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3.5 top-3 text-slate-400 hover:text-slate-200 transition-colors"
+                  className="absolute right-3.5 top-3 text-slate-400 hover:text-slate-200 transition-colors cursor-pointer"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -253,7 +323,7 @@ export default function LoginPage({ onLoginSuccess, onSkipToDemo }) {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 rounded-xl text-xs font-bold text-white shadow-xl transition-all flex items-center justify-center gap-2 mt-2 group"
+              className="w-full py-3 rounded-xl text-xs font-bold text-white shadow-xl transition-all flex items-center justify-center gap-2 mt-4 cursor-pointer group active:scale-[0.99]"
               style={{
                 background: `linear-gradient(135deg, ${theme.primary}, ${theme.primaryLight})`,
               }}
@@ -268,14 +338,12 @@ export default function LoginPage({ onLoginSuccess, onSkipToDemo }) {
             </button>
           </form>
         </div>
-      </div>
 
-      {/* Footer Info */}
-      <footer className="px-6 py-3 border-t border-slate-800/80 text-center text-[11px] text-slate-500 backdrop-blur-md bg-slate-950/40 relative z-20">
-        <div className="max-w-5xl mx-auto text-center">
-          <span>TRUST BANK Core Banking Systems • Terminal #TB-0492</span>
+        {/* Right Column Footer */}
+        <div className="text-center text-[11px] text-slate-500 pt-4">
+          <span>{lang === 'kh' ? 'សម្រាប់តែមន្ត្រីធនាគារដែលទទួលបានការអនុញ្ញាត • សាខាកណ្តាល' : 'Authorized Banking Personnel Only • Central Terminal'}</span>
         </div>
-      </footer>
+      </div>
     </div>
   );
 }

@@ -6,34 +6,34 @@ export default function QuickActionCard({ title, description, buttonText, icon: 
   const { theme } = useTheme();
 
   return (
-    <div className="glass-panel glass-panel-hover rounded-2xl p-5 flex flex-col justify-between group">
+    <div className="bg-white rounded-lg border border-gray-200 shadow-xs p-4 flex flex-col justify-between group hover:shadow-sm transition-shadow">
       <div>
         <div className="flex items-center gap-3">
           <div 
-            className="w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-105"
+            className="w-9 h-9 rounded-lg flex items-center justify-center transition-all duration-300 group-hover:scale-105"
             style={{ 
-              backgroundColor: `${theme.primaryLight}18`, 
-              color: theme.primaryLight,
-              border: `1px solid ${theme.primaryLight}35`
+              backgroundColor: `${theme.primaryLight}15`, 
+              color: theme.primary,
+              border: `1px solid ${theme.primaryLight}30`
             }}
           >
-            <Icon className="w-5 h-5" />
+            <Icon className="w-4 h-4" />
           </div>
           <div>
-            <h4 className="font-bold text-white text-sm group-hover:text-blue-300 transition-colors">
+            <h4 className="font-semibold text-gray-800 text-sm group-hover:text-blue-600 transition-colors">
               {title}
             </h4>
-            <span className="text-[10px] text-emerald-400 font-medium">Instant Clearance</span>
+            <span className="text-[10px] text-emerald-600 font-semibold">Instant Clearance</span>
           </div>
         </div>
-        <p className="mt-3 text-xs text-slate-400 leading-relaxed min-h-[36px]">
+        <p className="mt-2 text-xs text-gray-500 leading-relaxed min-h-[32px]">
           {description}
         </p>
       </div>
 
       <button
         onClick={onClick}
-        className="mt-4 w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-bold text-white transition-all shadow-md group-hover:shadow-blue-500/20"
+        className="mt-3 w-full flex items-center justify-center gap-2 py-2 px-3 rounded-md text-xs font-semibold text-white transition-all shadow-xs hover:opacity-95"
         style={{
           background: `linear-gradient(135deg, ${theme.primary}, ${theme.primaryLight})`,
         }}

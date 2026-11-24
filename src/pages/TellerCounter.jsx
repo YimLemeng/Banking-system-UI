@@ -24,6 +24,8 @@ import { useLoading } from '../context/LoadingContext';
 export default function TellerCounter({ 
   accounts = [], 
   onSuccess,
+  currentOperation = 'DEPOSIT',
+  onOperationChange,
   initialOperation = 'DEPOSIT',
   initialSourceAccount = '',
   initialTargetAccount = '',
@@ -33,15 +35,48 @@ export default function TellerCounter({
   const { theme } = useTheme();
   const { withLoading } = useLoading();
   const [refreshing, setRefreshing] = useState(false);
+  const [activeOp, setActiveOp] = useState(currentOperation || initialOperation || 'DEPOSIT');
 
-  const [operationType, setOperationType] = useState(initialOperation || 'DEPOSIT'); // DEPOSIT, WITHDRAW, TRANSFER
-  const [sourceAccount, setSourceAccount] = useState(initialSourceAccount || '');
-  const [targetAccount, setTargetAccount] = useState(initialTargetAccount || '');
-  const [amount, setAmount] = useState('');
-  const [description, setDescription] = useState('');
-  const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    if (currentOperation) {
+      setActiveOp(currentOperation);
+    }
+  }, [currentOperation]);
+
+  const handleOpSwitch = (op) => {
+    setActiveOp(op);
+    if (onOperationChange) {
+      onOperationChange(op);
+    }
+  };
+
+  // 3 Distinct Form States
+  const [depositTarget, setDepositTarget] = useState(
+    initialOperation === 'DEPOSIT' ? (initialTargetAccount || initialSourceAccount || '') : ''
+  );
+  const [depositAmount, setDepositAmount] = useState('');
+  const [depositMemo, setDepositMemo] = useState('');
+  const [depositError, setDepositError] = useState('');
+
+  const [withdrawSource, setWithdrawSource] = useState(
+    initialOperation === 'WITHDRAW' ? (initialSourceAccount || initialTargetAccount || '') : ''
+  );
+  const [withdrawAmount, setWithdrawAmount] = useState('');
+  const [withdrawMemo, setWithdrawMemo] = useState('');
+  const [withdrawError, setWithdrawError] = useState('');
+
+  const [transferSource, setTransferSource] = useState(
+    initialOperation === 'TRANSFER' ? (initialSourceAccount || '') : ''
+  );
+  const [transferTarget, setTransferTarget] = useState(
+    initialOperation === 'TRANSFER' ? (initialTargetAccount || '') : ''
+  );
+  const [transferAmount, setTransferAmount] = useState('');
+  const [transferMemo, setTransferMemo] = useState('');
+  const [transferError, setTransferError] = useState('');
+
+  const [submittingType, setSubmittingType] = useState(null); // 'DEPOSIT' | 'WITHDRAW' | 'TRANSFER' | null
   const [lastReceipt, setLastReceipt] = useState(null);
-  const [error, setError] = useState('');
 
   // Teller Slips History (Audit Trail & Customer Reprinting) - Real database operations
   const [slipHistory, setSlipHistory] = useState(() => {
@@ -95,8 +130,8 @@ export default function TellerCounter({
     }
   };
 
-  const sourceAccObj = accounts.find(a => a.accountNumber === (lastReceipt?.sourceAccount || sourceAccount));
-  const targetAccObj = accounts.find(a => a.accountNumber === (lastReceipt?.targetAccount || targetAccount));
+  const sourceAccObj = accounts.find(a => a.accountNumber === (lastReceipt?.sourceAccount || withdrawSource || transferSource));
+  const targetAccObj = accounts.find(a => a.accountNumber === (lastReceipt?.targetAccount || depositTarget || transferTarget));
 
   const getAmountInWords = (amt) => {
     const num = Math.floor(amt);
@@ -120,11 +155,22 @@ export default function TellerCounter({
 
   const handleRefreshClick = async () => {
     setRefreshing(true);
-    setSourceAccount('');
-    setTargetAccount('');
-    setAmount('');
-    setDescription('');
-    setError('');
+    setDepositTarget('');
+    setDepositAmount('');
+    setDepositMemo('');
+    setDepositError('');
+
+    setWithdrawSource('');
+    setWithdrawAmount('');
+    setWithdrawMemo('');
+    setWithdrawError('');
+
+    setTransferSource('');
+    setTransferTarget('');
+    setTransferAmount('');
+    setTransferMemo('');
+    setTransferError('');
+
     setLastReceipt(null);
     if (onRefresh) {
       await onRefresh();
@@ -133,117 +179,200 @@ export default function TellerCounter({
   };
 
   useEffect(() => {
-    if (initialOperation) {
-      setOperationType(initialOperation);
+    if (initialOperation === 'DEPOSIT') {
+      if (initialTargetAccount) setDepositTarget(initialTargetAccount);
+      else if (initialSourceAccount) setDepositTarget(initialSourceAccount);
+    } else if (initialOperation === 'WITHDRAW') {
+      if (initialSourceAccount) setWithdrawSource(initialSourceAccount);
+      else if (initialTargetAccount) setWithdrawSource(initialTargetAccount);
+    } else if (initialOperation === 'TRANSFER') {
+      if (initialSourceAccount) setTransferSource(initialSourceAccount);
+      if (initialTargetAccount) setTransferTarget(initialTargetAccount);
     }
-  }, [initialOperation]);
+  }, [initialOperation, initialSourceAccount, initialTargetAccount]);
 
-  useEffect(() => {
-    if (initialSourceAccount !== undefined) {
-      setSourceAccount(initialSourceAccount);
-    }
-  }, [initialSourceAccount]);
+  const quickDepositAmounts = [20, 50, 100, 500, 1000];
+  const quickWithdrawAmounts = [20, 50, 100, 500, 1000];
+  const quickTransferAmounts = [50, 100, 200, 500];
 
-  useEffect(() => {
-    if (initialTargetAccount !== undefined) {
-      setTargetAccount(initialTargetAccount);
-    }
-  }, [initialTargetAccount]);
-
-  const quickAmounts = [20, 50, 100, 200, 500, 1000, 5000];
-
-  const handleExecute = async (e) => {
+  // 1. Handle Cash Deposit Execution
+  const handleDeposit = async (e) => {
     e.preventDefault();
-    const numAmount = parseFloat(amount);
+    const numAmount = parseFloat(depositAmount);
     if (isNaN(numAmount) || numAmount <= 0) {
-      setError(lang === 'kh' ? 'សូមបញ្ចូលចំនួនទឹកប្រាក់ត្រឹមត្រូវ' : 'Please enter a valid amount');
+      setDepositError(lang === 'kh' ? 'សូមបញ្ចូលចំនួនទឹកប្រាក់ត្រឹមត្រូវ' : 'Please enter a valid amount');
+      return;
+    }
+    if (!depositTarget) {
+      setDepositError(lang === 'kh' ? 'សូមជ្រើសរើស ឬបញ្ចូលគណនីទទួលប្រាក់' : 'Please enter target account number');
       return;
     }
 
-    setLoading(true);
-    setError('');
-
-    const opTitles = {
-      DEPOSIT: lang === 'kh' ? 'កំពុងដំណើរការដាក់ប្រាក់ចូលគណនី...' : 'Executing Cash Deposit...',
-      WITHDRAW: lang === 'kh' ? 'កំពុងដំណើរការដកប្រាក់ពីគណនី...' : 'Executing Cash Withdrawal...',
-      TRANSFER: lang === 'kh' ? 'កំពុងដំណើរការផ្ទេរប្រាក់រវាងគណនី...' : 'Executing Account Transfer...',
-    };
-
-    const opMessage = lang === 'kh'
-      ? 'ប្រព័ន្ធធនាគារស្នូលកំពុងផ្ទៀងផ្ទាត់ និងកត់ត្រាចូល Ledger សូមរង់ចាំមួយភ្លែត...'
-      : 'Core banking ledger settling transaction. Please wait a moment...';
+    setDepositError('');
+    setSubmittingType('DEPOSIT');
 
     await withLoading(
-      opTitles[operationType] || 'Executing Transaction...',
+      lang === 'kh' ? 'កំពុងដំណើរការដាក់ប្រាក់ចូលគណនី...' : 'Executing Cash Deposit...',
       async () => {
         try {
-          let refId = `TX-${Math.floor(10000000 + Math.random() * 90000000)}`;
+          const refId = `TX-${Math.floor(10000000 + Math.random() * 90000000)}`;
+          await accountService.deposit(depositTarget, {
+            amount: numAmount,
+            description: depositMemo || 'Teller Cash Deposit'
+          });
 
-          if (operationType === 'DEPOSIT') {
-            if (!targetAccount) throw new Error('Target account number is required');
-            await accountService.deposit(targetAccount, { amount: numAmount, description: description || 'Teller Cash Deposit' });
-            const receipt = {
-              refId,
-              type: 'DEPOSIT',
-              targetAccount,
-              amount: numAmount,
-              teller: user?.username || 'admin',
-              timestamp: new Date().toISOString(),
-              status: 'SUCCESS',
-              description: description || 'Over-The-Counter Cash Deposit'
-            };
-            setLastReceipt(receipt);
-            saveSlipToHistory(receipt);
-            onSuccess(`Deposited $${numAmount.toLocaleString()} into ${targetAccount}`);
-          } else if (operationType === 'WITHDRAW') {
-            if (!sourceAccount) throw new Error('Source account number is required');
-            await accountService.withdraw(sourceAccount, { amount: numAmount, description: description || 'Teller Cash Withdrawal' });
-            const receipt = {
-              refId,
-              type: 'WITHDRAW',
-              sourceAccount,
-              amount: numAmount,
-              teller: user?.username || 'admin',
-              timestamp: new Date().toISOString(),
-              status: 'SUCCESS',
-              description: description || 'Over-The-Counter Cash Withdrawal'
-            };
-            setLastReceipt(receipt);
-            saveSlipToHistory(receipt);
-            onSuccess(`Withdrew $${numAmount.toLocaleString()} from ${sourceAccount}`);
-          } else {
-            if (!sourceAccount || !targetAccount) throw new Error('Both source and target accounts are required');
-            if (sourceAccount === targetAccount) throw new Error('Source and target accounts must be different');
-            await accountService.transfer({
-              sourceAccountNumber: sourceAccount,
-              targetAccountNumber: targetAccount,
-              amount: numAmount,
-              description: description || 'Teller Counter Transfer'
-            });
-            const receipt = {
-              refId,
-              type: 'TRANSFER',
-              sourceAccount,
-              targetAccount,
-              amount: numAmount,
-              teller: user?.username || 'admin',
-              timestamp: new Date().toISOString(),
-              status: 'SUCCESS',
-              description: description || 'Inter-Account Direct Funds Settlement'
-            };
-            setLastReceipt(receipt);
-            saveSlipToHistory(receipt);
-            onSuccess(`Transferred $${numAmount.toLocaleString()} from ${sourceAccount} to ${targetAccount}`);
-          }
+          const receipt = {
+            refId,
+            type: 'DEPOSIT',
+            targetAccount: depositTarget,
+            amount: numAmount,
+            teller: user?.username || 'admin',
+            timestamp: new Date().toISOString(),
+            status: 'SUCCESS',
+            description: depositMemo || 'Over-The-Counter Cash Deposit'
+          };
+
+          setLastReceipt(receipt);
+          saveSlipToHistory(receipt);
+          setDepositAmount('');
+          setDepositMemo('');
+          onSuccess?.(`Deposited $${numAmount.toLocaleString()} into ${depositTarget}`);
+
+          setTimeout(() => {
+            document.getElementById('teller-slip-preview')?.scrollIntoView({ behavior: 'smooth' });
+          }, 150);
         } catch (err) {
           const errMsg = err.response?.data?.message || err.message || (lang === 'kh' ? 'ប្រតិបត្តិការបរាជ័យលើ Server' : 'Transaction failed on server');
-          setError(errMsg);
+          setDepositError(errMsg);
         } finally {
-          setLoading(false);
+          setSubmittingType(null);
         }
       },
       650,
-      opMessage
+      lang === 'kh' ? 'ប្រព័ន្ធធនាគារស្នូលកំពុងកត់ត្រាចូល Ledger...' : 'Core banking ledger settling transaction. Please wait a moment...'
+    );
+  };
+
+  // 2. Handle Cash Withdrawal Execution
+  const handleWithdraw = async (e) => {
+    e.preventDefault();
+    const numAmount = parseFloat(withdrawAmount);
+    if (isNaN(numAmount) || numAmount <= 0) {
+      setWithdrawError(lang === 'kh' ? 'សូមបញ្ចូលចំនួនទឹកប្រាក់ត្រឹមត្រូវ' : 'Please enter a valid amount');
+      return;
+    }
+    if (!withdrawSource) {
+      setWithdrawError(lang === 'kh' ? 'សូមជ្រើសរើស ឬបញ្ចូលគណនីដកប្រាក់' : 'Please enter source account number');
+      return;
+    }
+
+    setWithdrawError('');
+    setSubmittingType('WITHDRAW');
+
+    await withLoading(
+      lang === 'kh' ? 'កំពុងដំណើរការដកប្រាក់ពីគណនី...' : 'Executing Cash Withdrawal...',
+      async () => {
+        try {
+          const refId = `TX-${Math.floor(10000000 + Math.random() * 90000000)}`;
+          await accountService.withdraw(withdrawSource, {
+            amount: numAmount,
+            description: withdrawMemo || 'Teller Cash Withdrawal'
+          });
+
+          const receipt = {
+            refId,
+            type: 'WITHDRAW',
+            sourceAccount: withdrawSource,
+            amount: numAmount,
+            teller: user?.username || 'admin',
+            timestamp: new Date().toISOString(),
+            status: 'SUCCESS',
+            description: withdrawMemo || 'Over-The-Counter Cash Withdrawal'
+          };
+
+          setLastReceipt(receipt);
+          saveSlipToHistory(receipt);
+          setWithdrawAmount('');
+          setWithdrawMemo('');
+          onSuccess?.(`Withdrew $${numAmount.toLocaleString()} from ${withdrawSource}`);
+
+          setTimeout(() => {
+            document.getElementById('teller-slip-preview')?.scrollIntoView({ behavior: 'smooth' });
+          }, 150);
+        } catch (err) {
+          const errMsg = err.response?.data?.message || err.message || (lang === 'kh' ? 'ប្រតិបត្តិការបរាជ័យលើ Server' : 'Transaction failed on server');
+          setWithdrawError(errMsg);
+        } finally {
+          setSubmittingType(null);
+        }
+      },
+      650,
+      lang === 'kh' ? 'ប្រព័ន្ធធនាគារស្នូលកំពុងផ្ទៀងផ្ទាត់ និងកត់ត្រាចូល Ledger...' : 'Core banking ledger settling transaction. Please wait a moment...'
+    );
+  };
+
+  // 3. Handle Account Transfer Execution
+  const handleTransfer = async (e) => {
+    e.preventDefault();
+    const numAmount = parseFloat(transferAmount);
+    if (isNaN(numAmount) || numAmount <= 0) {
+      setTransferError(lang === 'kh' ? 'សូមបញ្ចូលចំនួនទឹកប្រាក់ត្រឹមត្រូវ' : 'Please enter a valid amount');
+      return;
+    }
+    if (!transferSource || !transferTarget) {
+      setTransferError(lang === 'kh' ? 'សូមបញ្ចូលទាំងគណនីប្រភព និងគណនីគោលដៅ' : 'Both source and target accounts are required');
+      return;
+    }
+    if (transferSource === transferTarget) {
+      setTransferError(lang === 'kh' ? 'គណនីប្រភព និងគណនីគោលដៅត្រូវតែខុសគ្នា' : 'Source and target accounts must be different');
+      return;
+    }
+
+    setTransferError('');
+    setSubmittingType('TRANSFER');
+
+    await withLoading(
+      lang === 'kh' ? 'កំពុងដំណើរការផ្ទេរប្រាក់រវាងគណនី...' : 'Executing Account Transfer...',
+      async () => {
+        try {
+          const refId = `TX-${Math.floor(10000000 + Math.random() * 90000000)}`;
+          await accountService.transfer({
+            sourceAccountNumber: transferSource,
+            targetAccountNumber: transferTarget,
+            amount: numAmount,
+            description: transferMemo || 'Teller Counter Transfer'
+          });
+
+          const receipt = {
+            refId,
+            type: 'TRANSFER',
+            sourceAccount: transferSource,
+            targetAccount: transferTarget,
+            amount: numAmount,
+            teller: user?.username || 'admin',
+            timestamp: new Date().toISOString(),
+            status: 'SUCCESS',
+            description: transferMemo || 'Inter-Account Direct Funds Settlement'
+          };
+
+          setLastReceipt(receipt);
+          saveSlipToHistory(receipt);
+          setTransferAmount('');
+          setTransferMemo('');
+          onSuccess?.(`Transferred $${numAmount.toLocaleString()} from ${transferSource} to ${transferTarget}`);
+
+          setTimeout(() => {
+            document.getElementById('teller-slip-preview')?.scrollIntoView({ behavior: 'smooth' });
+          }, 150);
+        } catch (err) {
+          const errMsg = err.response?.data?.message || err.message || (lang === 'kh' ? 'ប្រតិបត្តិការបរាជ័យលើ Server' : 'Transaction failed on server');
+          setTransferError(errMsg);
+        } finally {
+          setSubmittingType(null);
+        }
+      },
+      650,
+      lang === 'kh' ? 'ប្រព័ន្ធធនាគារស្នូលកំពុងផ្ទៀងផ្ទាត់ និងកត់ត្រាចូល Ledger...' : 'Core banking ledger settling transaction. Please wait a moment...'
     );
   };
 
@@ -252,407 +381,616 @@ export default function TellerCounter({
       {/* ========================================================================= */}
       {/* 1. SCREEN ONLY VIEW (Hidden during print)                                */}
       {/* ========================================================================= */}
-      <div className="screen-only-teller space-y-6 pb-12">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-extrabold text-white tracking-tight">
-            {t.tellerCounter}
-          </h1>
-          <p className="text-xs text-slate-400 mt-1">
-            {lang === 'kh'
-              ? 'ការគ្រប់គ្រងសាច់ប្រាក់រហ័ស ប្រតិបត្តិការដាក់ប្រាក់ ដកប្រាក់ និងផ្ទេរប្រាក់ផ្ទៃក្នុងធនាគារ'
-              : 'High-speed cash handling, teller deposits, withdrawals, and inter-account clearing'}
-          </p>
-        </div>
-
-        {onRefresh && (
+      <div className="screen-only-teller space-y-4 pb-8">
+        {/* Top Header & Actions */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <h1 className="text-2xl font-semibold text-gray-800 tracking-tight">
+              {t.tellerCounter || 'Teller Counter (Cash & Pay)'}
+            </h1>
+          </div>
           <button
             type="button"
             onClick={handleRefreshClick}
             disabled={refreshing}
-            className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs font-semibold bg-slate-900/90 hover:bg-slate-800/90 text-slate-200 border border-slate-700/80 transition-all shadow-sm active:scale-95 cursor-pointer disabled:opacity-75"
-            title="Refresh Ledger & Clear Form"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-gray-700 bg-white hover:bg-gray-50 border border-gray-300 rounded shadow-2xs transition-colors disabled:opacity-60 cursor-pointer self-start sm:self-auto"
+            title="Refresh Ledger & Clear Forms"
           >
-            <RotateCw className={`w-3.5 h-3.5 text-blue-400 ${refreshing ? 'animate-spin' : ''}`} />
+            <RotateCw className={`w-3.5 h-3.5 text-blue-600 ${refreshing ? 'animate-spin' : ''}`} />
             <span>
               {refreshing
-                ? (lang === 'kh' ? 'កំពុងទាញយក...' : 'Refreshing...')
-                : (lang === 'kh' ? 'ទាញទិន្នន័យ & សម្អាត' : 'Refresh Counter')}
+                ? (lang === 'kh' ? 'កំពុងទាញ...' : 'Refreshing...')
+                : 'Refresh Counter'}
             </span>
           </button>
-        )}
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Counter Form */}
-        <div className="lg:col-span-2 glass-panel rounded-2xl p-6 space-y-5">
-          {/* Operation Selector */}
-          <div className="grid grid-cols-3 gap-2 bg-slate-900/90 p-1.5 rounded-xl border border-slate-800">
-            {[
-              { id: 'DEPOSIT', label: t.cashDeposit, icon: ArrowDownCircle, color: 'text-emerald-400' },
-              { id: 'WITHDRAW', label: t.cashWithdraw, icon: ArrowUpCircle, color: 'text-amber-400' },
-              { id: 'TRANSFER', label: t.accountTransfer, icon: ArrowRightLeft, color: 'text-blue-400' },
-            ].map((op) => {
-              const Icon = op.icon;
-              const isSelected = operationType === op.id;
-              return (
-                <button
-                  key={op.id}
-                  onClick={() => { setOperationType(op.id); setError(''); }}
-                  className={`flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-bold transition-all ${
-                    isSelected
-                      ? 'bg-slate-800 text-white shadow-sm border border-slate-700'
-                      : 'text-slate-400 hover:text-white'
-                  }`}
-                >
-                  <Icon className={`w-4 h-4 ${isSelected ? op.color : ''}`} />
-                  <span>{op.label}</span>
-                </button>
-              );
-            })}
-          </div>
-
-          {error && (
-            <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 shrink-0" />
-              <span>{error}</span>
-            </div>
-          )}
-
-          <form onSubmit={handleExecute} className="space-y-4">
-            {/* Source Account (For Withdraw and Transfer) */}
-            {(operationType === 'WITHDRAW' || operationType === 'TRANSFER') && (
-              <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                  {t.sourceAccount} (Debit) *
-                </label>
-                <input
-                  type="text"
-                  list="counterSourceList"
-                  required
-                  value={sourceAccount}
-                  onChange={(e) => setSourceAccount(e.target.value)}
-                  placeholder="Select or enter account..."
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900/90 border border-slate-700/80 text-white font-mono text-sm focus:outline-none focus:border-blue-500"
-                />
-                <datalist id="counterSourceList">
-                  {accounts.map((acc) => (
-                    <option key={acc.id} value={acc.accountNumber}>
-                      {acc.accountNumber} - {acc.customerName} (${acc.balance?.toLocaleString()})
-                    </option>
-                  ))}
-                </datalist>
-              </div>
-            )}
-
-            {/* Target Account (For Deposit and Transfer) */}
-            {(operationType === 'DEPOSIT' || operationType === 'TRANSFER') && (
-              <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                  {t.targetAccount} (Credit) *
-                </label>
-                <input
-                  type="text"
-                  list="counterTargetList"
-                  required
-                  value={targetAccount}
-                  onChange={(e) => setTargetAccount(e.target.value)}
-                  placeholder="Select or enter account..."
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900/90 border border-slate-700/80 text-white font-mono text-sm focus:outline-none focus:border-blue-500"
-                />
-                <datalist id="counterTargetList">
-                  {accounts.map((acc) => (
-                    <option key={acc.id} value={acc.accountNumber}>
-                      {acc.accountNumber} - {acc.customerName} (${acc.balance?.toLocaleString()})
-                    </option>
-                  ))}
-                </datalist>
-              </div>
-            )}
-
-            {/* Amount */}
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                {t.amount} *
-              </label>
-              <div className="relative">
-                <span className="absolute left-3.5 top-2.5 text-slate-400 font-bold">$</span>
-                <input
-                  type="number"
-                  step="0.01"
-                  min="0.01"
-                  required
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  placeholder="0.00"
-                  className="w-full pl-8 pr-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-700/80 text-white font-mono text-sm focus:outline-none focus:border-blue-500"
-                />
-              </div>
-
-              {/* Quick Select Buttons */}
-              <div className="flex flex-wrap items-center gap-1.5 mt-2">
-                <span className="text-[11px] text-slate-400 mr-1">Quick:</span>
-                {quickAmounts.map((q) => (
-                  <button
-                    key={q}
-                    type="button"
-                    onClick={() => setAmount(q.toString())}
-                    className="px-2 py-0.5 rounded-md text-[11px] font-mono font-medium bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700/60 transition-colors"
-                  >
-                    +${q}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Memo */}
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                {t.description}
-              </label>
-              <input
-                type="text"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Teller counter memo..."
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900/90 border border-slate-700/80 text-white text-sm focus:outline-none focus:border-blue-500"
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-3.5 rounded-xl text-xs font-bold text-white shadow-xl transition-all flex items-center justify-center gap-2 active:scale-[0.99] disabled:opacity-80 cursor-pointer"
-              style={{
-                background: `linear-gradient(135deg, ${theme.primary}, ${theme.primaryLight})`,
-              }}
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin text-white" />
-                  <span>{lang === 'kh' ? 'កំពុងដំណើរការប្រតិបត្តិការ...' : 'Processing Transaction...'}</span>
-                </>
-              ) : (
-                <>
-                  <span>
-                    {lang === 'kh'
-                      ? (operationType === 'DEPOSIT'
-                          ? 'អនុវត្តការដាក់ប្រាក់ឥឡូវនេះ (Execute DEPOSIT)'
-                          : operationType === 'WITHDRAW'
-                          ? 'អនុវត្តការដកប្រាក់ឥឡូវនេះ (Execute WITHDRAW)'
-                          : 'អនុវត្តការផ្ទេរប្រាក់ឥឡូវនេះ (Execute TRANSFER)')
-                      : `Execute ${operationType} Now`}
-                  </span>
-                </>
-              )}
-            </button>
-          </form>
         </div>
 
-        {/* Live Teller Receipt Slip */}
-        <div id="teller-slip-preview" className="glass-panel rounded-2xl p-6 flex flex-col justify-between">
-          <div>
-            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-              <div className="flex items-center gap-2">
-                <Receipt className="w-4 h-4 text-blue-400" />
-                <h3 className="font-bold text-white text-sm">Teller Transaction Slip</h3>
-              </div>
-              <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400">
-                AUDITED
-              </span>
-            </div>
-
-            {lastReceipt ? (
-              <div className="mt-4 space-y-3 font-mono text-xs">
-                <div className="p-3 rounded-xl bg-slate-900/90 border border-slate-800 space-y-2">
-                  <div className="flex justify-between text-slate-400 text-[11px]">
-                    <span>Reference ID</span>
-                    <span className="text-white font-bold">{lastReceipt.refId}</span>
-                  </div>
-                  <div className="flex justify-between text-slate-400 text-[11px]">
-                    <span>Operation</span>
-                    <span className="text-emerald-400 font-bold">{lastReceipt.type}</span>
-                  </div>
-                  {lastReceipt.sourceAccount && (
-                    <div className="flex justify-between text-slate-400 text-[11px]">
-                      <span>Source Acc</span>
-                      <span className="text-white">{lastReceipt.sourceAccount}</span>
+        {/* ROW 1: Dedicated Active Form (2 Cols) + Live Teller Transaction Slip (1 Col) */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          {/* Active Operation Form (lg:col-span-2) */}
+          <div className="lg:col-span-2">
+            {activeOp === 'DEPOSIT' && (
+              <div className="bg-white rounded-lg border border-gray-200 shadow-xs p-5 flex flex-col justify-between h-full">
+                <div>
+                  <div className="flex items-center justify-between pb-3 border-b border-gray-100 mb-4">
+                    <div className="flex items-center gap-2">
+                      <ArrowDownCircle className="w-5 h-5 text-emerald-600" />
+                      <div>
+                        <h3 className="font-semibold text-gray-800 text-sm">
+                          {lang === 'kh' ? 'ដាក់ប្រាក់ (Cash Deposit)' : 'Cash Deposit Form'}
+                        </h3>
+                        <p className="text-[11px] text-gray-500">
+                          {lang === 'kh' ? 'បញ្ចូលប្រាក់ចូលទៅក្នុងគណនីអតិថិជនភ្លាមៗជាមួយបង្កាន់ដៃផ្លូវការ' : 'Deposit funds directly into client account with audited teller slip.'}
+                        </p>
+                      </div>
                     </div>
-                  )}
-                  {lastReceipt.targetAccount && (
-                    <div className="flex justify-between text-slate-400 text-[11px]">
-                      <span>Target Acc</span>
-                      <span className="text-white">{lastReceipt.targetAccount}</span>
-                    </div>
-                  )}
-                  <div className="flex justify-between text-slate-400 text-[11px] pt-1 border-t border-slate-800">
-                    <span>Total Cleared</span>
-                    <span className="text-emerald-400 font-bold text-sm">
-                      ${lastReceipt.amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                    <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                      CREDIT
                     </span>
                   </div>
-                  <div className="flex justify-between text-slate-400 text-[10px]">
-                    <span>Teller</span>
-                    <span>{lastReceipt.teller}</span>
-                  </div>
-                  <div className="flex justify-between text-slate-400 text-[10px]">
-                    <span>Timestamp</span>
-                    <span>{new Date(lastReceipt.timestamp).toLocaleTimeString()}</span>
-                  </div>
+
+                  {depositError && (
+                    <div className="mb-4 p-2.5 rounded bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
+                      <AlertCircle className="w-4 h-4 text-rose-500 shrink-0" />
+                      <span>{depositError}</span>
+                    </div>
+                  )}
+
+                  <form id="teller-deposit-form" onSubmit={handleDeposit} className="space-y-4">
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-700 mb-1">
+                        {t.targetAccount} (Credit) <span className="text-rose-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        list="counterDepositTargetList"
+                        required
+                        value={depositTarget}
+                        onChange={(e) => { setDepositTarget(e.target.value); setDepositError(''); }}
+                        placeholder="Select or enter account..."
+                        className="w-full px-3 py-2 rounded border border-gray-300 bg-white text-gray-800 font-mono text-xs focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 shadow-2xs"
+                      />
+                      <datalist id="counterDepositTargetList">
+                        {accounts.map((acc) => (
+                          <option key={acc.id} value={acc.accountNumber}>
+                            {acc.accountNumber} - {acc.customerName} (${acc.balance?.toLocaleString()})
+                          </option>
+                        ))}
+                      </datalist>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-700 mb-1">
+                        {t.amount} <span className="text-rose-500">*</span>
+                      </label>
+                      <div className="relative">
+                        <span className="absolute left-3 top-2 text-gray-400 font-bold text-xs">$</span>
+                        <input
+                          type="number"
+                          step="0.01"
+                          min="0.01"
+                          required
+                          value={depositAmount}
+                          onChange={(e) => { setDepositAmount(e.target.value); setDepositError(''); }}
+                          placeholder="0.00"
+                          className="w-full pl-7 pr-3 py-2 rounded border border-gray-300 bg-white text-gray-800 font-mono text-sm font-semibold focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 shadow-2xs"
+                        />
+                      </div>
+                      <div className="flex flex-wrap items-center gap-1 mt-1.5">
+                        <span className="text-[10px] text-gray-400 mr-0.5">Quick:</span>
+                        {quickDepositAmounts.map((q) => (
+                          <button
+                            key={q}
+                            type="button"
+                            onClick={() => setDepositAmount(q.toString())}
+                            className="px-1.5 py-0.5 rounded text-[10px] font-mono font-medium bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300 transition-colors cursor-pointer"
+                          >
+                            +${q}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-700 mb-1">
+                        {t.description} / Memo
+                      </label>
+                      <input
+                        type="text"
+                        value={depositMemo}
+                        onChange={(e) => setDepositMemo(e.target.value)}
+                        placeholder="Deposit memo or remark..."
+                        className="w-full px-3 py-2 rounded border border-gray-300 bg-white text-gray-800 text-xs focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 shadow-2xs"
+                      />
+                    </div>
+                  </form>
                 </div>
+
+                <button
+                  form="teller-deposit-form"
+                  type="submit"
+                  disabled={submittingType === 'DEPOSIT'}
+                  className="mt-6 w-full py-2.5 rounded text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 shadow-2xs transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70"
+                >
+                  {submittingType === 'DEPOSIT' ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin text-white" />
+                      <span>{lang === 'kh' ? 'កំពុងដាក់ប្រាក់...' : 'Depositing...'}</span>
+                    </>
+                  ) : (
+                    <>
+                      <ArrowDownCircle className="w-3.5 h-3.5" />
+                      <span>{lang === 'kh' ? 'អនុវត្តការដាក់ប្រាក់ (Execute Deposit)' : 'Execute Cash Deposit Now'}</span>
+                    </>
+                  )}
+                </button>
               </div>
-            ) : (
-              <div className="py-16 text-center text-slate-400 text-xs">
-                <Receipt className="w-8 h-8 mx-auto mb-2 opacity-30 text-slate-400" />
-                <p>No recent transaction slip.</p>
-                <p className="text-[11px] text-slate-400 mt-1">Execute a counter operation to generate slip.</p>
+            )}
+
+            {activeOp === 'WITHDRAW' && (
+              <div className="bg-white rounded-lg border border-gray-200 shadow-xs p-5 flex flex-col justify-between h-full">
+                <div>
+                  <div className="flex items-center justify-between pb-3 border-b border-gray-100 mb-4">
+                    <div className="flex items-center gap-2">
+                      <ArrowUpCircle className="w-5 h-5 text-amber-500" />
+                      <div>
+                        <h3 className="font-semibold text-gray-800 text-sm">
+                          {lang === 'kh' ? 'ដកប្រាក់ (Cash Withdrawal)' : 'Cash Withdrawal Form'}
+                        </h3>
+                        <p className="text-[11px] text-gray-500">
+                          {lang === 'kh' ? 'ដកប្រាក់ពីគណនីអតិថិជនជាមួយការត្រួតពិនិត្យសមតុល្យ & KYC' : 'Debit funds from client account with live balance verification.'}
+                        </p>
+                      </div>
+                    </div>
+                    <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
+                      DEBIT
+                    </span>
+                  </div>
+
+                  {withdrawError && (
+                    <div className="mb-4 p-2.5 rounded bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
+                      <AlertCircle className="w-4 h-4 text-rose-500 shrink-0" />
+                      <span>{withdrawError}</span>
+                    </div>
+                  )}
+
+                  <form id="teller-withdraw-form" onSubmit={handleWithdraw} className="space-y-4">
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-700 mb-1">
+                        {t.sourceAccount} (Debit) <span className="text-rose-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        list="counterWithdrawSourceList"
+                        required
+                        value={withdrawSource}
+                        onChange={(e) => { setWithdrawSource(e.target.value); setWithdrawError(''); }}
+                        placeholder="Select or enter account..."
+                        className="w-full px-3 py-2 rounded border border-gray-300 bg-white text-gray-800 font-mono text-xs focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 shadow-2xs"
+                      />
+                      <datalist id="counterWithdrawSourceList">
+                        {accounts.map((acc) => (
+                          <option key={acc.id} value={acc.accountNumber}>
+                            {acc.accountNumber} - {acc.customerName} (${acc.balance?.toLocaleString()})
+                          </option>
+                        ))}
+                      </datalist>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-700 mb-1">
+                        {t.amount} <span className="text-rose-500">*</span>
+                      </label>
+                      <div className="relative">
+                        <span className="absolute left-3 top-2 text-gray-400 font-bold text-xs">$</span>
+                        <input
+                          type="number"
+                          step="0.01"
+                          min="0.01"
+                          required
+                          value={withdrawAmount}
+                          onChange={(e) => { setWithdrawAmount(e.target.value); setWithdrawError(''); }}
+                          placeholder="0.00"
+                          className="w-full pl-7 pr-3 py-2 rounded border border-gray-300 bg-white text-gray-800 font-mono text-sm font-semibold focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 shadow-2xs"
+                        />
+                      </div>
+                      <div className="flex flex-wrap items-center gap-1 mt-1.5">
+                        <span className="text-[10px] text-gray-400 mr-0.5">Quick:</span>
+                        {quickWithdrawAmounts.map((q) => (
+                          <button
+                            key={q}
+                            type="button"
+                            onClick={() => setWithdrawAmount(q.toString())}
+                            className="px-1.5 py-0.5 rounded text-[10px] font-mono font-medium bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300 transition-colors cursor-pointer"
+                          >
+                            +${q}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-700 mb-1">
+                        {t.description} / Memo
+                      </label>
+                      <input
+                        type="text"
+                        value={withdrawMemo}
+                        onChange={(e) => setWithdrawMemo(e.target.value)}
+                        placeholder="Withdrawal memo..."
+                        className="w-full px-3 py-2 rounded border border-gray-300 bg-white text-gray-800 text-xs focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 shadow-2xs"
+                      />
+                    </div>
+                  </form>
+                </div>
+
+                <button
+                  form="teller-withdraw-form"
+                  type="submit"
+                  disabled={submittingType === 'WITHDRAW'}
+                  className="mt-6 w-full py-2.5 rounded text-xs font-semibold text-white bg-amber-500 hover:bg-amber-600 shadow-2xs transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70"
+                >
+                  {submittingType === 'WITHDRAW' ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin text-white" />
+                      <span>{lang === 'kh' ? 'កំពុងដកប្រាក់...' : 'Withdrawing...'}</span>
+                    </>
+                  ) : (
+                    <>
+                      <ArrowUpCircle className="w-3.5 h-3.5" />
+                      <span>{lang === 'kh' ? 'អនុវត្តការដកប្រាក់ (Execute Withdraw)' : 'Execute Cash Withdrawal Now'}</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            )}
+
+            {activeOp === 'TRANSFER' && (
+              <div className="bg-white rounded-lg border border-gray-200 shadow-xs p-5 flex flex-col justify-between h-full">
+                <div>
+                  <div className="flex items-center justify-between pb-3 border-b border-gray-100 mb-4">
+                    <div className="flex items-center gap-2">
+                      <ArrowRightLeft className="w-5 h-5 text-blue-600" />
+                      <div>
+                        <h3 className="font-semibold text-gray-800 text-sm">
+                          {lang === 'kh' ? 'ផ្ទេរប្រាក់ (Account Transfer)' : 'Account Transfer Form'}
+                        </h3>
+                        <p className="text-[11px] text-gray-500">
+                          {lang === 'kh' ? 'ផ្ទេរប្រាក់ភ្លាមៗរវាងគណនីក្នុងប្រព័ន្ធជាមួយការកាត់កងស្វ័យប្រវត្តិ' : 'Direct inter-account movement with real-time settlement.'}
+                        </p>
+                      </div>
+                    </div>
+                    <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+                      INTERNAL
+                    </span>
+                  </div>
+
+                  {transferError && (
+                    <div className="mb-4 p-2.5 rounded bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
+                      <AlertCircle className="w-4 h-4 text-rose-500 shrink-0" />
+                      <span>{transferError}</span>
+                    </div>
+                  )}
+
+                  <form id="teller-transfer-form" onSubmit={handleTransfer} className="space-y-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-700 mb-1">
+                          {t.sourceAccount} (Debit) <span className="text-rose-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          list="counterTransferSourceList"
+                          required
+                          value={transferSource}
+                          onChange={(e) => { setTransferSource(e.target.value); setTransferError(''); }}
+                          placeholder="Source account..."
+                          className="w-full px-3 py-2 rounded border border-gray-300 bg-white text-gray-800 font-mono text-xs focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-2xs"
+                        />
+                        <datalist id="counterTransferSourceList">
+                          {accounts.map((acc) => (
+                            <option key={acc.id} value={acc.accountNumber}>
+                              {acc.accountNumber} - {acc.customerName} (${acc.balance?.toLocaleString()})
+                            </option>
+                          ))}
+                        </datalist>
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-700 mb-1">
+                          {t.targetAccount} (Credit) <span className="text-rose-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          list="counterTransferTargetList"
+                          required
+                          value={transferTarget}
+                          onChange={(e) => { setTransferTarget(e.target.value); setTransferError(''); }}
+                          placeholder="Target account..."
+                          className="w-full px-3 py-2 rounded border border-gray-300 bg-white text-gray-800 font-mono text-xs focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-2xs"
+                        />
+                        <datalist id="counterTransferTargetList">
+                          {accounts.map((acc) => (
+                            <option key={acc.id} value={acc.accountNumber}>
+                              {acc.accountNumber} - {acc.customerName} (${acc.balance?.toLocaleString()})
+                            </option>
+                          ))}
+                        </datalist>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-700 mb-1">
+                        {t.amount} <span className="text-rose-500">*</span>
+                      </label>
+                      <div className="relative">
+                        <span className="absolute left-3 top-2 text-gray-400 font-bold text-xs">$</span>
+                        <input
+                          type="number"
+                          step="0.01"
+                          min="0.01"
+                          required
+                          value={transferAmount}
+                          onChange={(e) => { setTransferAmount(e.target.value); setTransferError(''); }}
+                          placeholder="0.00"
+                          className="w-full pl-7 pr-3 py-2 rounded border border-gray-300 bg-white text-gray-800 font-mono text-sm font-semibold focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-2xs"
+                        />
+                      </div>
+                      <div className="flex flex-wrap items-center gap-1 mt-1.5">
+                        <span className="text-[10px] text-gray-400 mr-0.5">Quick:</span>
+                        {quickTransferAmounts.map((q) => (
+                          <button
+                            key={q}
+                            type="button"
+                            onClick={() => setTransferAmount(q.toString())}
+                            className="px-1.5 py-0.5 rounded text-[10px] font-mono font-medium bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300 transition-colors cursor-pointer"
+                          >
+                            +${q}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-700 mb-1">
+                        {t.description} / Memo
+                      </label>
+                      <input
+                        type="text"
+                        value={transferMemo}
+                        onChange={(e) => setTransferMemo(e.target.value)}
+                        placeholder="Transfer description..."
+                        className="w-full px-3 py-2 rounded border border-gray-300 bg-white text-gray-800 text-xs focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-2xs"
+                      />
+                    </div>
+                  </form>
+                </div>
+
+                <button
+                  form="teller-transfer-form"
+                  type="submit"
+                  disabled={submittingType === 'TRANSFER'}
+                  className="mt-6 w-full py-2.5 rounded text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 shadow-2xs transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70"
+                >
+                  {submittingType === 'TRANSFER' ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin text-white" />
+                      <span>{lang === 'kh' ? 'កំពុងផ្ទេរ...' : 'Transferring...'}</span>
+                    </>
+                  ) : (
+                    <>
+                      <ArrowRightLeft className="w-3.5 h-3.5" />
+                      <span>{lang === 'kh' ? 'អនុវត្តការផ្ទេរប្រាក់ (Execute Transfer)' : 'Execute Account Transfer Now'}</span>
+                    </>
+                  )}
+                </button>
               </div>
             )}
           </div>
 
-          {lastReceipt && (
-            <button
-              onClick={() => window.print()}
-              className="mt-4 w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-lg transition-all active:scale-95 cursor-pointer"
-            >
-              <Printer className="w-4 h-4" />
-              <span>Print Teller Slip (PDF)</span>
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* ========================================================================= */}
-      {/* 1.1 RECENT COUNTER SLIPS HISTORY (AUDIT & CUSTOMER REPRINTING)            */}
-      {/* ========================================================================= */}
-      <div className="glass-panel rounded-2xl p-6 space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center">
-              <History className="w-4 h-4 text-indigo-400" />
-            </div>
+          {/* Right: Live Teller Receipt Slip Preview (lg:col-span-1) */}
+          <div id="teller-slip-preview" className="lg:col-span-1 bg-white rounded-lg border border-gray-200 shadow-xs p-5 flex flex-col justify-between">
             <div>
-              <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                <span>{lang === 'kh' ? 'ប្រវត្តិបង្កាន់ដៃប្រតិបត្តិការបេឡា' : 'Recent Counter Slips History'}</span>
-                <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-blue-500/15 text-blue-400 border border-blue-500/30">
-                  {slipHistory.length} {lang === 'kh' ? 'បង្កាន់ដៃ' : 'Slips'}
+              <div className="flex items-center justify-between pb-3 border-b border-gray-100">
+                <div className="flex items-center gap-2">
+                  <Receipt className="w-4 h-4 text-blue-600" />
+                  <h3 className="font-semibold text-gray-800 text-sm">Teller Transaction Slip</h3>
+                </div>
+                <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  AUDITED
                 </span>
-              </h3>
-              <p className="text-[11px] text-slate-400">
-                {lang === 'kh' 
-                  ? 'បញ្ជីបង្កាន់ដៃដែលបានប្រតិបត្តិការនៅបញ្ជរ អាចមើលឡើងវិញ ឬបោះពុម្ពជាច្បាប់ចម្លង (Customer Reprint Copy) ជូនភ្ញៀវ' 
-                  : 'Audited log of counter transactions. View details or reprint official customer copy on demand.'}
-              </p>
-            </div>
-          </div>
+              </div>
 
-          {isAdmin && slipHistory.length > 0 && (
-            <button
-              type="button"
-              onClick={handleClearHistory}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-rose-400 bg-slate-900/60 hover:bg-rose-950/30 border border-slate-800 hover:border-rose-900/50 transition-all self-start sm:self-auto cursor-pointer"
-              title={lang === 'kh' ? 'សម្អាតប្រវត្តិបង្កាន់ដៃ (សម្រាប់តែ Admin)' : 'Clear local slip history (Admin Only)'}
-            >
-              <Trash2 className="w-3.5 h-3.5" />
-              <span>{lang === 'kh' ? 'សម្អាតប្រវត្តិ' : 'Clear Slips'}</span>
-            </button>
-          )}
+              {lastReceipt ? (
+                <div className="mt-4 space-y-3 font-mono text-xs">
+                  <div className="p-3.5 rounded bg-gray-50 border border-gray-200 space-y-2">
+                    <div className="flex justify-between text-gray-500 text-[11px]">
+                      <span>Reference ID</span>
+                      <span className="text-gray-900 font-bold">{lastReceipt.refId}</span>
+                    </div>
+                    <div className="flex justify-between text-gray-500 text-[11px]">
+                      <span>Operation</span>
+                      <span className="text-emerald-600 font-bold">{lastReceipt.type}</span>
+                    </div>
+                    {lastReceipt.sourceAccount && (
+                      <div className="flex justify-between text-gray-500 text-[11px]">
+                        <span>Source Acc</span>
+                        <span className="text-gray-900 font-medium">{lastReceipt.sourceAccount}</span>
+                      </div>
+                    )}
+                    {lastReceipt.targetAccount && (
+                      <div className="flex justify-between text-gray-500 text-[11px]">
+                        <span>Target Acc</span>
+                        <span className="text-gray-900 font-medium">{lastReceipt.targetAccount}</span>
+                      </div>
+                    )}
+                    <div className="flex justify-between text-gray-500 text-[11px] pt-1.5 border-t border-gray-200">
+                      <span className="font-semibold text-gray-700">Total Cleared</span>
+                      <span className="text-emerald-600 font-bold text-sm">
+                        ${lastReceipt.amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-gray-400 text-[10px] pt-1">
+                      <span>Teller</span>
+                      <span>{lastReceipt.teller}</span>
+                    </div>
+                    <div className="flex justify-between text-gray-400 text-[10px]">
+                      <span>Timestamp</span>
+                      <span>{new Date(lastReceipt.timestamp).toLocaleTimeString()}</span>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="py-14 text-center text-gray-400 text-xs">
+                  <Receipt className="w-8 h-8 mx-auto mb-2 opacity-40 text-gray-400" />
+                  <p className="font-medium text-gray-500">No recent transaction slip.</p>
+                  <p className="text-[11px] text-gray-400 mt-1">Execute a counter operation to generate slip.</p>
+                </div>
+              )}
+            </div>
+
+            {lastReceipt && (
+              <button
+                type="button"
+                onClick={() => window.print()}
+                className="mt-4 w-full flex items-center justify-center gap-2 py-2 rounded text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white shadow-2xs transition-colors cursor-pointer"
+              >
+                <Printer className="w-3.5 h-3.5" />
+                <span>Print Teller Slip (PDF)</span>
+              </button>
+            )}
+          </div>
         </div>
 
-        {slipHistory.length === 0 ? (
-          <div className="py-12 text-center text-slate-500">
-            <Receipt className="w-8 h-8 mx-auto mb-2 opacity-30 text-slate-400" />
-            <p className="text-xs">{lang === 'kh' ? 'មិនទាន់មានប្រវត្តិបង្កាន់ដៃនៅឡើយទេ' : 'No counter transaction slips recorded yet.'}</p>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs border-collapse">
-              <thead>
-                <tr className="border-b border-slate-800 text-slate-400 text-[11px] font-semibold bg-slate-900/40">
-                  <th className="py-2.5 px-3">លេខកូដយោង / REF ID</th>
-                  <th className="py-2.5 px-3">ប្រតិបត្តិការ / OP</th>
-                  <th className="py-2.5 px-3">គណនី / ACCOUNTS</th>
-                  <th className="py-2.5 px-3 text-right">ចំនួនទឹកប្រាក់ / AMOUNT</th>
-                  <th className="py-2.5 px-3">កាលបរិច្ឆេទ / TIME</th>
-                  <th className="py-2.5 px-3">បេឡាករ / TELLER</th>
-                  <th className="py-2.5 px-3 text-center">សកម្មភាព / ACTIONS</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-800/60">
-                {slipHistory.map((slip) => {
-                  const isDeposit = slip.type === 'DEPOSIT';
-                  const isWithdraw = slip.type === 'WITHDRAW';
-                  const isTransfer = slip.type === 'TRANSFER';
+        {/* ROW 2: Recent Counter Slips History Table (Full Width) */}
+        <div className="bg-white rounded-lg border border-gray-200 shadow-xs p-5 space-y-3.5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-gray-100">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600">
+                <History className="w-4 h-4" />
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-gray-800 flex items-center gap-2">
+                  <span>{lang === 'kh' ? 'ប្រវត្តិបង្កាន់ដៃប្រតិបត្តិការបេឡា' : 'Recent Counter Slips History'}</span>
+                  <span className="text-[10px] font-mono font-bold px-2 py-0.2 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+                    {slipHistory.length} {lang === 'kh' ? 'បង្កាន់ដៃ' : 'Slips'}
+                  </span>
+                </h3>
+                <p className="text-[11px] text-gray-500">
+                  {lang === 'kh' 
+                    ? 'បញ្ជីបង្កាន់ដៃដែលបានប្រតិបត្តិការនៅបញ្ជរ អាចមើលឡើងវិញ ឬបោះពុម្ពជាច្បាប់ចម្លងជូនភ្ញៀវ' 
+                    : 'Audited log of counter transactions. View details or reprint official customer copy on demand.'}
+                </p>
+              </div>
+            </div>
 
-                  return (
-                    <tr key={slip.refId} className="hover:bg-slate-800/40 transition-colors">
-                      <td className="py-2.5 px-3 font-mono font-bold text-slate-200">
-                        {slip.refId}
-                      </td>
-                      <td className="py-2.5 px-3">
-                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase font-mono ${
-                          isDeposit ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' :
-                          isWithdraw ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30' :
-                          'bg-blue-500/15 text-blue-400 border border-blue-500/30'
-                        }`}>
-                          {slip.type}
-                        </span>
-                      </td>
-                      <td className="py-2.5 px-3 font-mono text-slate-300">
-                        {isDeposit && (
-                          <span>{slip.targetAccount}</span>
-                        )}
-                        {isWithdraw && (
-                          <span>{slip.sourceAccount}</span>
-                        )}
-                        {isTransfer && (
-                          <span className="flex items-center gap-1">
-                            <span>{slip.sourceAccount}</span>
-                            <span className="text-slate-500">→</span>
-                            <span className="text-blue-400">{slip.targetAccount}</span>
-                          </span>
-                        )}
-                      </td>
-                      <td className="py-2.5 px-3 text-right font-mono font-bold text-slate-100">
-                        ${(parseFloat(slip.amount) || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                      </td>
-                      <td className="py-2.5 px-3 text-slate-400 text-[11px] font-mono">
-                        {new Date(slip.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-                      </td>
-                      <td className="py-2.5 px-3 text-slate-300 font-mono text-[11px]">
-                        {slip.teller || 'admin'}
-                      </td>
-                      <td className="py-2.5 px-3">
-                        <div className="flex items-center justify-center gap-1.5">
-                          <button
-                            type="button"
-                            onClick={() => handleViewSlip(slip)}
-                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-all cursor-pointer shadow-sm active:scale-95"
-                            title="View voucher preview"
-                          >
-                            <Eye className="w-3 h-3 text-blue-400" />
-                            <span>{lang === 'kh' ? 'មើល' : 'View'}</span>
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleReprintSlip(slip)}
-                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-bold bg-blue-600/90 hover:bg-blue-500 text-white border border-blue-500 transition-all cursor-pointer shadow-sm active:scale-95"
-                            title="Reprint Customer Copy"
-                          >
-                            <Printer className="w-3 h-3 text-white" />
-                            <span>{lang === 'kh' ? 'Print ឡើងវិញ' : 'Reprint'}</span>
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+            {isAdmin && slipHistory.length > 0 && (
+              <button
+                type="button"
+                onClick={handleClearHistory}
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-medium text-gray-600 hover:text-rose-600 bg-white hover:bg-rose-50 border border-gray-300 hover:border-rose-300 transition-colors self-start sm:self-auto cursor-pointer"
+                title={lang === 'kh' ? 'សម្អាតប្រវត្តិបង្កាន់ដៃ' : 'Clear local slip history'}
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>{lang === 'kh' ? 'សម្អាតប្រវត្តិ' : 'Clear Slips'}</span>
+              </button>
+            )}
           </div>
-        )}
+
+          {slipHistory.length === 0 ? (
+            <div className="py-12 text-center text-gray-400">
+              <Receipt className="w-8 h-8 mx-auto mb-2 opacity-40 text-gray-400" />
+              <p className="text-xs font-medium text-gray-500">{lang === 'kh' ? 'មិនទាន់មានប្រវត្តិបង្កាន់ដៃនៅឡើយទេ' : 'No counter transaction slips recorded yet.'}</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto border border-gray-200 rounded mt-3">
+              <table className="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr className="border-b border-gray-200 text-gray-700 text-[11px] font-semibold bg-gray-50">
+                    <th className="py-2.5 px-3">REF ID</th>
+                    <th className="py-2.5 px-3">OPERATION</th>
+                    <th className="py-2.5 px-3">ACCOUNTS</th>
+                    <th className="py-2.5 px-3 text-right">AMOUNT</th>
+                    <th className="py-2.5 px-3">TIME</th>
+                    <th className="py-2.5 px-3">TELLER</th>
+                    <th className="py-2.5 px-3 text-center">ACTIONS</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100 text-gray-700">
+                  {slipHistory.map((slip) => {
+                    const isDeposit = slip.type === 'DEPOSIT';
+                    const isWithdraw = slip.type === 'WITHDRAW';
+                    const isTransfer = slip.type === 'TRANSFER';
+
+                    return (
+                      <tr key={slip.refId} className="hover:bg-gray-50/80 transition-colors">
+                        <td className="py-2.5 px-3 font-mono font-bold text-gray-900">
+                          {slip.refId}
+                        </td>
+                        <td className="py-2.5 px-3">
+                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase font-mono text-white ${
+                            isDeposit ? 'bg-emerald-600' :
+                            isWithdraw ? 'bg-amber-500' :
+                            'bg-blue-600'
+                          }`}>
+                            {slip.type}
+                          </span>
+                        </td>
+                        <td className="py-2.5 px-3 font-mono text-gray-700">
+                          {isDeposit && (
+                            <span>{slip.targetAccount}</span>
+                          )}
+                          {isWithdraw && (
+                            <span>{slip.sourceAccount}</span>
+                          )}
+                          {isTransfer && (
+                            <span className="flex items-center gap-1">
+                              <span>{slip.sourceAccount}</span>
+                              <span className="text-gray-400">→</span>
+                              <span className="text-blue-600 font-semibold">{slip.targetAccount}</span>
+                            </span>
+                          )}
+                        </td>
+                        <td className="py-2.5 px-3 text-right font-mono font-bold text-gray-900">
+                          ${(parseFloat(slip.amount) || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </td>
+                        <td className="py-2.5 px-3 text-gray-500 text-[11px] font-mono">
+                          {new Date(slip.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                        </td>
+                        <td className="py-2.5 px-3 text-gray-600 font-mono text-[11px]">
+                          {slip.teller || 'admin'}
+                        </td>
+                        <td className="py-2.5 px-3">
+                          <div className="flex items-center justify-center gap-1.5">
+                            <button
+                              type="button"
+                              onClick={() => handleViewSlip(slip)}
+                              className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 transition-colors cursor-pointer shadow-2xs"
+                              title="View voucher preview"
+                            >
+                              <Eye className="w-3 h-3 text-blue-600" />
+                              <span>{lang === 'kh' ? 'មើល' : 'View'}</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleReprintSlip(slip)}
+                              className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold bg-blue-600 hover:bg-blue-700 text-white transition-colors cursor-pointer shadow-2xs"
+                              title="Reprint Customer Copy"
+                            >
+                              <Printer className="w-3.5 h-3.5 text-white" />
+                              <span>{lang === 'kh' ? 'Print ឡើងវិញ' : 'Reprint'}</span>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
       </div>
-    </div>
 
       {/* ========================================================================= */}
       {/* 2. OFFICIAL BANK TELLER TRANSACTION VOUCHER (PRINT ONLY - HIGH CLASS)    */}
@@ -811,7 +1149,7 @@ export default function TellerCounter({
                     កំណត់សម្គាល់ / Description:
                   </td>
                   <td className="py-2.5 px-4 text-slate-800 font-medium">
-                    {description || 'Official Branch Counter Operation Settled'}
+                    {lastReceipt.description || 'Official Branch Counter Operation Settled'}
                   </td>
                 </tr>
                 <tr className="border-b border-slate-200">
