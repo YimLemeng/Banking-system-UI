@@ -1,4 +1,5 @@
 import React from 'react';
+import { ChevronDown } from 'lucide-react';
 
 export default function TablePagination({
   currentPage = 1,
@@ -38,27 +39,32 @@ export default function TablePagination({
         <span className="font-semibold text-gray-700">{totalItems}</span> entries
       </div>
       <div className="flex items-center gap-3">
-        <div className="flex items-center gap-1.5">
-          <span>Page Size</span>
-          <select
-            value={pageSize}
-            onChange={(e) => {
-              const newSize = Number(e.target.value);
-              if (onPageSizeChange) {
-                onPageSizeChange(newSize);
-              }
-              if (onPageChange) {
-                onPageChange(1);
-              }
-            }}
-            className="border border-gray-300 rounded px-2 py-0.5 bg-white text-gray-700 focus:outline-none focus:border-blue-500 text-xs cursor-pointer shadow-2xs"
-          >
-            {pageSizeOptions.map((opt) => (
-              <option key={opt} value={opt}>
-                {opt}
-              </option>
-            ))}
-          </select>
+        <div className="flex items-center gap-2">
+          <span className="text-gray-500 font-medium">Page Size</span>
+          <div className="relative inline-flex items-center group">
+            <select
+              value={pageSize}
+              onChange={(e) => {
+                const newSize = Number(e.target.value);
+                if (onPageSizeChange) {
+                  onPageSizeChange(newSize);
+                }
+                if (onPageChange) {
+                  onPageChange(1);
+                }
+              }}
+              className="appearance-none bg-white hover:bg-gray-50/80 text-gray-700 text-xs font-semibold pl-2.5 pr-7 py-1 rounded border border-gray-300 hover:border-gray-400 shadow-2xs focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 cursor-pointer transition-colors"
+            >
+              {pageSizeOptions.map((opt) => (
+                <option key={opt} value={opt} className="bg-white text-gray-800">
+                  {opt}
+                </option>
+              ))}
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2 text-gray-400 group-hover:text-gray-600 transition-colors">
+              <ChevronDown className="w-3.5 h-3.5" />
+            </div>
+          </div>
         </div>
 
         <div className="inline-flex rounded-md shadow-2xs">
