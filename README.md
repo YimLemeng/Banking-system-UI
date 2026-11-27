@@ -119,8 +119,3 @@ npm run build
 # Preview production build locally
 npm run preview
 ```
-
----
-
-## 📜 License & Compliance
-This software is built for educational, demonstration, and enterprise research purposes under the **MIT License**. Regulated terminal workflows are designed in alignment with National Bank of Cambodia (NBC) core banking guidelines.
