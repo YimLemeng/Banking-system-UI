@@ -295,30 +295,30 @@ export default function App() {
   }
 
   return (
-    <div className="h-screen max-h-screen bg-[#f4f6f9] text-slate-800 flex flex-col font-sans overflow-hidden relative">
-      {/* Top Fixed Header with Sidebar Toggle */}
-      <Header 
-        isOnline={isOnline}
-        sidebarCollapsed={sidebarCollapsed}
-        onToggleSidebar={toggleSidebar}
-        onOpenProfile={() => handleTabChange('profile')}
-      />
-
+    <div className="h-screen max-h-screen bg-[#ecf0f5] text-slate-800 flex font-sans overflow-hidden relative">
       {/* Top Loading Progress Bar */}
       {tabLoading && (
-        <div className="fixed top-16 left-0 right-0 z-50 h-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-emerald-400 animate-pulse shadow-md shadow-blue-500/50 pointer-events-none" />
+        <div className="fixed top-14 left-0 right-0 z-50 h-1 bg-gradient-to-r from-[#3c8dbc] via-sky-400 to-emerald-400 animate-pulse shadow-md pointer-events-none" />
       )}
 
-      <div className="flex-1 flex w-full min-h-0 overflow-hidden">
-        {/* Left Sidebar with Collapse state & Logout button */}
-        <Sidebar 
-          activeTab={activeTab} 
-          setActiveTab={handleTabChange}
-          isCollapsed={sidebarCollapsed}
-          onToggleCollapse={toggleSidebar}
-          onLogout={() => setShowLogoutModal(true)}
-          tellerOperation={tellerState.operation}
-          onSelectTellerOp={(op) => navigateToTeller(op)}
+      {/* 1. Full-Height Left Sidebar (TRUST BANK Brand Banner at Top-Left) */}
+      <Sidebar 
+        activeTab={activeTab} 
+        setActiveTab={handleTabChange}
+        isCollapsed={sidebarCollapsed}
+        onToggleCollapse={toggleSidebar}
+        onLogout={() => setShowLogoutModal(true)}
+        tellerOperation={tellerState.operation}
+        onSelectTellerOp={(op) => navigateToTeller(op)}
+      />
+
+      {/* 2. Right Column: Top Header + Scrollable Main Content */}
+      <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
+        <Header 
+          isOnline={isOnline}
+          sidebarCollapsed={sidebarCollapsed}
+          onToggleSidebar={toggleSidebar}
+          onOpenProfile={() => handleTabChange('profile')}
         />
 
         {/* Main Content Area */}
@@ -415,13 +415,21 @@ export default function App() {
 
           {activeTab === 'profile' && <StaffProfile onNotify={showNotification} />}
 
-          {/* AdminLTE Bottom Footer */}
-          <footer className="mt-8 pt-4 pb-3 border-t border-gray-200 text-xs text-gray-500 flex flex-col sm:flex-row items-center justify-between gap-2">
+          {/* Classic Footer */}
+          <footer className="mt-8 pt-4 pb-3 border-t border-[#d2d6de] text-xs text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-2">
             <div>
-              <strong>Copyright &copy; 2014-2026 <span className="text-blue-600 font-semibold">Trust Bank Core</span>.</strong> All rights reserved.
+              {lang === 'kh' ? (
+                <>
+                  <strong>រក្សាសិទ្ធិ &copy; ២០១៤-២០២៦ <span className="text-[#3c8dbc] font-semibold">ធនាគារ ត្រាស់ ប៊ែង</span>។</strong> រក្សាសិទ្ធិគ្រប់យ៉ាង។
+                </>
+              ) : (
+                <>
+                  <strong>Copyright &copy; 2014-2026 <span className="text-[#3c8dbc] font-semibold">Trust Bank Core</span>.</strong> All rights reserved.
+                </>
+              )}
             </div>
-            <div className="text-gray-400">
-              Core Banking Terminal • <span className="font-mono text-gray-500">v4.0.0</span>
+            <div className="text-slate-400">
+              {lang === 'kh' ? 'ប្រព័ន្ធធនាគារស្នូល' : 'Core Banking Terminal'} • <span className="font-mono text-slate-600 font-semibold">v4.0.0</span>
             </div>
           </footer>
         </main>

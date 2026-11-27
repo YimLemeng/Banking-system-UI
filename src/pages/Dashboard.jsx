@@ -213,20 +213,20 @@ export default function Dashboard({
 
   return (
     <div className="space-y-5 pb-6">
-      {/* AdminLTE 4 Header with Title and Refresh Action */}
+      {/* Classic Heritage Header with Title and Refresh Action */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-        <h1 className="text-2xl font-semibold text-gray-800 tracking-tight">
+        <h1 className="classic-page-title">
           {lang === 'kh' ? 'ផ្ទាំងគ្រប់គ្រងទូទៅ' : 'Dashboard'}
         </h1>
         <button
           type="button"
           onClick={onRefresh}
           disabled={loading}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-gray-700 bg-white hover:bg-gray-50 border border-gray-300 rounded shadow-2xs transition-colors disabled:opacity-60 cursor-pointer self-start sm:self-auto"
+          className="classic-btn-secondary flex items-center gap-1.5 py-1.5 px-3 disabled:opacity-60 self-start sm:self-auto"
           title={lang === 'kh' ? 'ទាញទិន្នន័យថ្មី' : 'Refresh Dashboard Data'}
         >
-          <RotateCw className={`w-3.5 h-3.5 text-blue-600 ${loading ? 'animate-spin' : ''}`} />
-          <span>{loading ? (lang === 'kh' ? 'កំពុងទាញ...' : 'Refreshing...') : 'Refresh'}</span>
+          <RotateCw className={`w-3.5 h-3.5 text-slate-800 ${loading ? 'animate-spin' : ''}`} />
+          <span>{loading ? (lang === 'kh' ? 'កំពុងទាញ...' : 'Refreshing...') : (lang === 'kh' ? 'ធ្វើបច្ចុប្បន្នភាព' : 'Refresh')}</span>
         </button>
       </div>
 
@@ -280,9 +280,9 @@ export default function Dashboard({
       {/* Middle Grid: Transaction Volume Chart & Branch Network Card */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* Left: Transaction Volume Smooth Wave Chart (2 Cols) */}
-        <div className="lg:col-span-2 bg-white rounded-lg border border-gray-200 shadow-xs p-5 flex flex-col justify-between">
-          <div className="flex items-center justify-between pb-3 border-b border-gray-100">
-            <h3 className="text-base font-semibold text-gray-800">
+        <div className="lg:col-span-2 classic-form-card p-5 flex flex-col justify-between">
+          <div className="flex items-center justify-between pb-3 border-b border-[#d2d6de]">
+            <h3 className="text-base font-bold text-slate-800 tracking-wide">
               {lang === 'kh' ? 'លំហូរសាច់ប្រាក់ប្រតិបត្តិការ' : 'Transaction Volume & Cash Flow'}
             </h3>
             <div className="flex items-center gap-3 text-xs text-gray-500">
@@ -384,14 +384,14 @@ export default function Dashboard({
           </div>
         </div>
 
-        {/* Right: Branch Network Blue Card (1 Col) */}
-        <div className="bg-[#007bff] text-white rounded-lg shadow-xs p-5 flex flex-col justify-between relative overflow-hidden">
+        {/* Right: Branch Network Classic Blue Card (1 Col) */}
+        <div className="bg-[#3c8dbc] text-white rounded-[3px] border border-[#367fa9] shadow-xs p-5 flex flex-col justify-between relative overflow-hidden">
           <div className="flex items-center justify-between pb-2 border-b border-white/20">
             <h3 className="text-base font-semibold text-white">
               {lang === 'kh' ? 'បណ្តាញសាខា & សាច់ប្រាក់' : 'Branch Liquidity & Network'}
             </h3>
             <div className="flex items-center gap-1.5 text-white/80">
-              <button className="w-5 h-5 rounded hover:bg-white/10 flex items-center justify-center">
+              <button className="w-5 h-5 rounded-[2px] hover:bg-white/15 flex items-center justify-center">
                 <Minus className="w-3.5 h-3.5" />
               </button>
             </div>
@@ -399,7 +399,7 @@ export default function Dashboard({
 
           {/* World Map Graphic / Points */}
           <div className="py-4 relative flex items-center justify-center">
-            <div className="w-full h-44 relative bg-blue-500/30 rounded-lg p-2 flex items-center justify-center border border-white/10 overflow-hidden">
+            <div className="w-full h-44 relative bg-[#367fa9]/60 rounded-[2px] p-2 flex items-center justify-center border border-white/15 overflow-hidden">
               {/* Map stylized vector paths */}
               <svg viewBox="0 0 400 200" className="w-full h-full opacity-60">
                 <circle cx="90" cy="70" r="14" fill="#ffffff" opacity="0.4" />
@@ -500,140 +500,142 @@ export default function Dashboard({
         />
       </div>
 
-      {/* AdminLTE 4 Data Table: Recent Customer Accounts (Matching media_1795500605557_23ea6932.jpg) */}
-      <div className="bg-white rounded-lg border border-gray-200 shadow-xs p-5 space-y-3.5">
+      {/* Classic Heritage Data Table: Recent Customer Accounts */}
+      <div className="classic-table-card">
         {/* Table Header Controls */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <h3 className="text-base font-semibold text-gray-800">
+        <div className="classic-table-header">
+          <h3 className="text-base font-bold text-slate-800 tracking-wide">
             {lang === 'kh' ? 'គណនីអតិថិជនថ្មីៗ' : 'Users & Customer Accounts'}
           </h3>
 
           {/* Right: Filter rows... Search box */}
           <div className="relative">
-            <Search className="w-3.5 h-3.5 text-gray-400 absolute left-2.5 top-2 pointer-events-none" />
+            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2 pointer-events-none" />
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Filter rows..."
-              className="pl-8 pr-3 py-1 text-xs rounded border border-gray-300 bg-white text-gray-700 placeholder-gray-400 focus:outline-none focus:border-blue-500 w-52 sm:w-64"
+              placeholder={lang === 'kh' ? 'ស្វែងរកទិន្នន័យ...' : 'Filter rows...'}
+              className="classic-input pl-8 pr-3 py-1 w-52 sm:w-64"
             />
           </div>
         </div>
 
+        <div className="p-5 space-y-3.5">
         {/* Data Table */}
-        <div className="overflow-x-auto border border-gray-200 rounded">
-          <table className="w-full text-left text-xs border-collapse">
+        <div className="erp-table-wrap">
+          <table className="erp-table">
             <thead>
-              <tr className="bg-gray-50/80 border-b border-gray-200 text-gray-700 font-semibold">
-                <th className="py-2.5 px-3 w-12">
-                  <div className="flex items-center justify-between">
+              <tr>
+                <th className="w-12">
+                  <div className="flex items-center justify-between gap-1">
                     <span>#</span>
-                    <span className="text-[10px] text-gray-400">▲</span>
+                    <span className="text-[10px] text-slate-400">↑↓</span>
                   </div>
                 </th>
-                <th className="py-2.5 px-3">
-                  <div className="flex items-center justify-between">
-                    <span>Name</span>
-                    <span className="text-[10px] text-gray-400">▲</span>
+                <th>
+                  <div className="flex items-center justify-between gap-1">
+                    <span>{lang === 'kh' ? 'ឈ្មោះ' : 'Name'}</span>
+                    <span className="text-[10px] text-slate-400">↑↓</span>
                   </div>
                 </th>
-                <th className="py-2.5 px-3">
-                  <div className="flex items-center justify-between">
-                    <span>Account Number</span>
-                    <span className="text-[10px] text-gray-400">▲</span>
+                <th>
+                  <div className="flex items-center justify-between gap-1">
+                    <span>{lang === 'kh' ? 'លេខគណនី' : 'Account Number'}</span>
+                    <span className="text-[10px] text-slate-400">↑↓</span>
                   </div>
                 </th>
-                <th className="py-2.5 px-3">
-                  <div className="flex items-center justify-between">
-                    <span>Role / Type</span>
-                    <span className="text-[10px] text-gray-400">▲</span>
+                <th>
+                  <div className="flex items-center justify-between gap-1">
+                    <span>{lang === 'kh' ? 'ប្រភេទ' : 'Role / Type'}</span>
+                    <span className="text-[10px] text-slate-400">↑↓</span>
                   </div>
                 </th>
-                <th className="py-2.5 px-3 text-right">
+                <th className="text-right">
                   <div className="flex items-center justify-end gap-1">
-                    <span>Balance</span>
-                    <span className="text-[10px] text-gray-400">▲</span>
+                    <span>{lang === 'kh' ? 'សមតុល្យ' : 'Balance'}</span>
+                    <span className="text-[10px] text-slate-400">↑↓</span>
                   </div>
                 </th>
-                <th className="py-2.5 px-3 text-center">
+                <th className="text-center">
                   <div className="flex items-center justify-center gap-1">
-                    <span>Status</span>
-                    <span className="text-[10px] text-gray-400">▲</span>
+                    <span>{lang === 'kh' ? 'ស្ថានភាព' : 'Status'}</span>
+                    <span className="text-[10px] text-slate-400">↑↓</span>
                   </div>
                 </th>
-                <th className="py-2.5 px-3">
-                  <div className="flex items-center justify-between">
-                    <span>Joined</span>
-                    <span className="text-[10px] text-gray-400">▲</span>
+                <th>
+                  <div className="flex items-center justify-between gap-1">
+                    <span>{lang === 'kh' ? 'ថ្ងៃបើកគណនី' : 'Joined'}</span>
+                    <span className="text-[10px] text-slate-400">↑↓</span>
                   </div>
                 </th>
-                <th className="py-2.5 px-3 text-right">Actions</th>
+                <th className="text-right">{lang === 'kh' ? 'សកម្មភាព' : 'Actions'}</th>
               </tr>
             </thead>
 
             {/* Table Rows */}
-            <tbody className="divide-y divide-gray-100 text-gray-700 font-normal">
+            <tbody>
               {filteredAccounts.length === 0 ? (
                 <tr>
-                  <td colSpan="8" className="text-center py-8 text-gray-400">
+                  <td colSpan="8" className="text-center py-8 text-slate-400">
                     No matching records found.
                   </td>
                 </tr>
               ) : (
                 paginatedAccounts.map((acc, index) => (
-                  <tr 
-                    key={acc.id} 
-                    className="hover:bg-gray-50/80 transition-colors"
-                  >
-                    <td className="py-2.5 px-3 font-medium text-gray-500">
+                  <tr key={acc.id}>
+                    <td className="font-mono text-slate-500">
                       {(currentPage - 1) * pageSize + index + 1}
                     </td>
-                    <td className="py-2.5 px-3 font-medium text-gray-900">
+                    <td className="font-semibold text-slate-800">
                       {acc.customerName || `Customer #${acc.customerId}`}
                     </td>
-                    <td className="py-2.5 px-3 font-mono font-medium text-blue-600">
+                    <td className="font-mono font-medium text-blue-600">
                       {acc.accountNumber}
                     </td>
-                    <td className="py-2.5 px-3">
+                    <td className="text-slate-600">
                       {acc.accountType === 'SAVINGS' ? 'Viewer' : 'Editor'}
                     </td>
-                    <td className="py-2.5 px-3 text-right font-mono font-semibold text-gray-900">
+                    <td className="text-right font-mono font-bold text-slate-900">
                       ${(acc.balance || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </td>
-                    <td className="py-2.5 px-3 text-center">
-                      <span className={`inline-block px-2.5 py-0.5 rounded-full text-[11px] font-semibold text-white ${
+                    <td className="text-center">
+                      <span className={
                         acc.status === 'LOCKED'
-                          ? 'bg-[#6c757d]'
+                          ? 'erp-status-muted'
                           : acc.accountType === 'SAVINGS'
-                          ? 'bg-[#28a745]'
-                          : 'bg-[#17a2b8]'
-                      }`}>
-                        {acc.status === 'LOCKED' ? 'Suspended' : acc.accountType === 'SAVINGS' ? 'Active' : 'Invited'}
+                          ? 'erp-status-active'
+                          : 'erp-status-info'
+                      }>
+                        {acc.status === 'LOCKED'
+                          ? (lang === 'kh' ? 'ផ្អាក' : 'Suspended')
+                          : acc.accountType === 'SAVINGS'
+                          ? (lang === 'kh' ? 'សកម្ម' : 'Active')
+                          : (lang === 'kh' ? 'បានអញ្ជើញ' : 'Invited')}
                       </span>
                     </td>
-                    <td className="py-2.5 px-3 text-gray-500 font-mono text-[11px]">
+                    <td className="text-slate-500 font-mono text-[11px]">
                       {acc.createdAt ? new Date(acc.createdAt).toISOString().slice(0, 10) : '2024-03-12'}
                     </td>
-                    <td className="py-2.5 px-3 text-right">
+                    <td className="text-right">
                       <div className="flex items-center justify-end gap-1.5">
                         <button
                           onClick={() => onOpenDeposit && onOpenDeposit(acc.accountNumber)}
-                          className="px-2 py-0.5 rounded bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-semibold text-[11px] border border-emerald-200 transition-colors"
+                          className="px-2 py-1 rounded bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-semibold text-[11px] border border-emerald-200 transition-colors cursor-pointer"
                         >
-                          + Dep
+                          {lang === 'kh' ? '+ ដាក់ប្រាក់' : '+ Dep'}
                         </button>
                         <button
                           onClick={() => onOpenWithdraw && onOpenWithdraw(acc.accountNumber)}
-                          className="px-2 py-0.5 rounded bg-amber-50 hover:bg-amber-100 text-amber-700 font-semibold text-[11px] border border-amber-200 transition-colors"
+                          className="px-2 py-1 rounded bg-amber-50 hover:bg-amber-100 text-amber-700 font-semibold text-[11px] border border-amber-200 transition-colors cursor-pointer"
                         >
-                          - With
+                          {lang === 'kh' ? '- ដកប្រាក់' : '- With'}
                         </button>
                         <button
                           onClick={() => onOpenTransfer && onOpenTransfer(acc.accountNumber)}
-                          className="px-2 py-0.5 rounded bg-blue-50 hover:bg-blue-100 text-blue-700 font-semibold text-[11px] border border-blue-200 transition-colors"
+                          className="erp-btn-view"
                         >
-                          Transfer
+                          {lang === 'kh' ? 'ផ្ទេរប្រាក់' : 'Transfer'}
                         </button>
                       </div>
                     </td>
@@ -655,6 +657,7 @@ export default function Dashboard({
             setCurrentPage(1);
           }}
         />
+        </div>
       </div>
     </div>
   );

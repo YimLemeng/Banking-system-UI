@@ -75,9 +75,9 @@ export default function SystemUsers({ onRefresh }) {
     <div>
       {/* 1. SCREEN VIEW (Visible on web app, hidden when printing) */}
       <div className="screen-only-report space-y-4 pb-8">
-      {/* AdminLTE 4 Header with Title and Actions */}
+      {/* Classic Heritage Header with Title and Actions */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-        <h1 className="text-2xl font-semibold text-gray-800 tracking-tight">
+        <h1 className="classic-page-title">
           {t.systemUsers}
         </h1>
         <div className="flex items-center gap-2 self-start sm:self-auto">
@@ -85,140 +85,144 @@ export default function SystemUsers({ onRefresh }) {
             type="button"
             onClick={handleRefreshClick}
             disabled={loading}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-gray-700 bg-white hover:bg-gray-50 border border-gray-300 rounded shadow-2xs transition-colors disabled:opacity-60 cursor-pointer"
+            className="classic-btn-secondary flex items-center gap-1.5 py-1.5 px-3 disabled:opacity-60"
             title="Refresh Users"
           >
-            <RotateCw className={`w-3.5 h-3.5 text-blue-600 ${loading ? 'animate-spin' : ''}`} />
-            <span>{loading ? (lang === 'kh' ? 'កំពុងទាញ...' : 'Refreshing...') : 'Refresh'}</span>
+            <RotateCw className={`w-3.5 h-3.5 text-slate-800 ${loading ? 'animate-spin' : ''}`} />
+            <span>{loading ? (lang === 'kh' ? 'កំពុងទាញ...' : 'Refreshing...') : (lang === 'kh' ? 'ធ្វើបច្ចុប្បន្នភាព' : 'Refresh')}</span>
           </button>
         </div>
       </div>
 
-      {/* AdminLTE 4 Data Table Card */}
-      <div className="bg-white rounded-lg border border-gray-200 shadow-xs p-5 space-y-3.5">
+      {/* Classic Heritage Data Table Card */}
+      <div className="classic-table-card">
         {/* Card Header: Users on left, Filter rows on right */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="classic-table-header">
           <div className="flex items-center gap-3">
-            <h3 className="text-base font-semibold text-gray-800">
-              Users
+            <h3 className="text-base font-bold text-slate-800 tracking-wide">
+              {lang === 'kh' ? 'អ្នកប្រើប្រាស់ប្រព័ន្ធ' : 'Users'}
             </h3>
-            <span className="text-xs text-gray-500 font-medium">
-              ({filtered.length} live staff entries)
+            <span className="text-xs text-slate-500 font-medium">
+              ({filtered.length} {lang === 'kh' ? 'មន្ត្រីសកម្ម' : 'live staff entries'})
             </span>
           </div>
 
           <div className="relative">
-            <Search className="w-3.5 h-3.5 text-gray-400 absolute left-2.5 top-2 pointer-events-none" />
+            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2 pointer-events-none" />
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Filter rows..."
-              className="pl-8 pr-3 py-1 text-xs rounded border border-gray-300 bg-white text-gray-700 placeholder-gray-400 focus:outline-none focus:border-blue-500 w-52 sm:w-64"
+              placeholder={lang === 'kh' ? 'ស្វែងរកទិន្នន័យ...' : 'Filter rows...'}
+              className="classic-input pl-8 pr-3 py-1 w-52 sm:w-64"
             />
           </div>
         </div>
 
-        {/* Table exactly matching media_1795500605557_23ea6932.jpg */}
-        <div className="overflow-x-auto border border-gray-200 rounded">
-          <table className="w-full text-left text-xs border-collapse">
+        <div className="p-5 space-y-3.5">
+        {/* Table */}
+        <div className="erp-table-wrap">
+          <table className="erp-table">
             <thead>
-              <tr className="bg-gray-50/80 border-b border-gray-200 text-gray-700 font-semibold">
-                <th className="py-2.5 px-3 w-12">
-                  <div className="flex items-center justify-between">
+              <tr>
+                <th className="w-12">
+                  <div className="flex items-center justify-between gap-1">
                     <span>#</span>
-                    <span className="text-[10px] text-gray-400">▲</span>
+                    <span className="text-[10px] text-slate-400">↑↓</span>
                   </div>
                 </th>
-                <th className="py-2.5 px-3">
-                  <div className="flex items-center justify-between">
-                    <span>Name</span>
-                    <span className="text-[10px] text-gray-400">▲</span>
+                <th>
+                  <div className="flex items-center justify-between gap-1">
+                    <span>{lang === 'kh' ? 'ឈ្មោះ' : 'Name'}</span>
+                    <span className="text-[10px] text-slate-400">↑↓</span>
                   </div>
                 </th>
-                <th className="py-2.5 px-3">
-                  <div className="flex items-center justify-between">
-                    <span>Email</span>
-                    <span className="text-[10px] text-gray-400">▲</span>
+                <th>
+                  <div className="flex items-center justify-between gap-1">
+                    <span>{lang === 'kh' ? 'អ៊ីមែល' : 'Email'}</span>
+                    <span className="text-[10px] text-slate-400">↑↓</span>
                   </div>
                 </th>
-                <th className="py-2.5 px-3">
-                  <div className="flex items-center justify-between">
-                    <span>Role</span>
-                    <span className="text-[10px] text-gray-400">▲</span>
+                <th>
+                  <div className="flex items-center justify-between gap-1">
+                    <span>{lang === 'kh' ? 'តួនាទី' : 'Role'}</span>
+                    <span className="text-[10px] text-slate-400">↑↓</span>
                   </div>
                 </th>
-                <th className="py-2.5 px-3 text-center">
+                <th className="text-center">
                   <div className="flex items-center justify-center gap-1">
-                    <span>Status</span>
-                    <span className="text-[10px] text-gray-400">▲</span>
+                    <span>{lang === 'kh' ? 'ស្ថានភាព' : 'Status'}</span>
+                    <span className="text-[10px] text-slate-400">↑↓</span>
                   </div>
                 </th>
-                <th className="py-2.5 px-3">
-                  <div className="flex items-center justify-between">
-                    <span>Joined</span>
-                    <span className="text-[10px] text-gray-400">▲</span>
+                <th>
+                  <div className="flex items-center justify-between gap-1">
+                    <span>{lang === 'kh' ? 'ថ្ងៃចូលបម្រើការ' : 'Joined'}</span>
+                    <span className="text-[10px] text-slate-400">↑↓</span>
                   </div>
                 </th>
-                <th className="py-2.5 px-3 text-right">Actions</th>
+                <th className="text-right">{lang === 'kh' ? 'សកម្មភាព' : 'Actions'}</th>
               </tr>
             </thead>
 
             {/* Table Rows */}
-            <tbody className="divide-y divide-gray-100 text-gray-700 font-normal">
+            <tbody>
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan="7" className="text-center py-10 text-gray-400">
+                  <td colSpan="7" className="text-center py-10 text-slate-400">
                     {loading ? 'Loading system users...' : 'No users found.'}
                   </td>
                 </tr>
               ) : (
                 paginated.map((usr, index) => (
-                  <tr key={usr.id} className="hover:bg-gray-50/80 transition-colors">
-                    <td className="py-2.5 px-3 font-medium text-gray-500">
+                  <tr key={usr.id}>
+                    <td className="font-mono text-slate-500">
                       {(currentPage - 1) * pageSize + index + 1}
                     </td>
-                    <td className="py-2.5 px-3">
+                    <td>
                       <div className="flex items-center gap-2">
                         <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-700 font-bold flex items-center justify-center text-[10px] shrink-0">
                           {(usr.fullName || usr.username || 'U')[0].toUpperCase()}
                         </div>
-                        <span className="font-medium text-gray-900">
+                        <span className="font-semibold text-slate-800">
                           {usr.fullName || usr.username}
                         </span>
                       </div>
                     </td>
-                    <td className="py-2.5 px-3 text-gray-600 font-mono text-[11px]">
+                    <td className="text-slate-600 font-mono text-[11px]">
                       {usr.email || `${usr.username}@trustbank.com`}
                     </td>
-                    <td className="py-2.5 px-3 text-gray-700">
+                    <td className="text-slate-700">
                       {usr.role ? String(usr.role).replace('ROLE_', '') : 'Admin'}
                     </td>
-                    <td className="py-2.5 px-3 text-center">
-                      <span className={`inline-block px-2.5 py-0.5 rounded-full text-[11px] font-semibold text-white ${
+                    <td className="text-center">
+                      <span className={
                         usr.status === 'SUSPENDED' 
-                          ? 'bg-[#6c757d]' 
+                          ? 'erp-status-muted' 
                           : usr.status === 'INVITED' 
-                          ? 'bg-[#17a2b8]' 
-                          : 'bg-[#28a745]'
-                      }`}>
-                        {usr.status || 'Active'}
+                          ? 'erp-status-info' 
+                          : 'erp-status-active'
+                      }>
+                        {lang === 'kh'
+                          ? (usr.status === 'SUSPENDED' ? 'ផ្អាក' : usr.status === 'INVITED' ? 'បានអញ្ជើញ' : 'សកម្ម')
+                          : (usr.status || 'Active')}
                       </span>
                     </td>
-                    <td className="py-2.5 px-3 text-gray-500 font-mono text-[11px]">
+                    <td className="text-slate-500 font-mono text-[11px]">
                       {usr.createdAt ? new Date(usr.createdAt).toISOString().slice(0, 10) : '2024-03-12'}
                     </td>
-                    <td className="py-2.5 px-3 text-right">
+                    <td className="text-right">
                       <button
                         type="button"
                         onClick={() => {
                           setSelectedUser(usr);
                           setShowViewModal(true);
                         }}
-                        className="p-1 rounded hover:bg-gray-100 text-gray-600 hover:text-blue-600 transition-colors"
-                        title="View Staff Details"
+                        className="erp-btn-view"
+                        title={lang === 'kh' ? 'មើលព័ត៌មានលម្អិត' : 'View Staff Details'}
                       >
                         <Eye className="w-3.5 h-3.5" />
+                        <span>{lang === 'kh' ? 'មើល' : 'View'}</span>
                       </button>
                     </td>
                   </tr>
@@ -239,6 +243,7 @@ export default function SystemUsers({ onRefresh }) {
             setCurrentPage(1);
           }}
         />
+        </div>
       </div>
 
       {/* View User Modal */}

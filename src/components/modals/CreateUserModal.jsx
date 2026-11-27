@@ -106,25 +106,25 @@ export default function CreateUserModal({ isOpen, onClose, onUserCreated }) {
   };
 
   return createPortal(
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-fadeIn" onClick={onClose}>
-      <div className="w-full max-w-xl bg-white border border-gray-200 rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh]" onClick={(e) => e.stopPropagation()}>
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#0b1322]/60 backdrop-blur-[1px] animate-fadeIn" onClick={onClose}>
+      <div className="w-full max-w-xl classic-modal flex flex-col max-h-[92vh]" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
-        <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between bg-gray-50/90">
+        <div className="classic-header">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 border border-blue-200 flex items-center justify-center shadow-2xs">
+            <div className="classic-header-icon">
               <UserPlus className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-bold text-gray-900 text-base">
+              <h3 className="font-bold text-slate-800 text-base tracking-wide">
                 {lang === 'kh' ? 'បង្កើតគណនីអ្នកប្រើប្រាស់' : 'Create System User'}
               </h3>
-              <p className="text-xs text-gray-500 mt-0.5">Core System Access & Permission Management</p>
+              <p className="text-[11px] text-slate-500 mt-0.5">Core System Access & Permission Management</p>
             </div>
           </div>
           <button 
             type="button"
             onClick={onClose}
-            className="w-8 h-8 rounded-lg hover:bg-gray-200 text-gray-400 hover:text-gray-700 flex items-center justify-center transition-colors cursor-pointer"
+            className="classic-close-btn"
           >
             <X className="w-4 h-4" />
           </button>
@@ -133,8 +133,8 @@ export default function CreateUserModal({ isOpen, onClose, onUserCreated }) {
         {/* Modal Body */}
         <div className="p-6 overflow-y-auto space-y-4">
           {error && (
-            <div className="p-2.5 rounded bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 text-rose-500 shrink-0" />
+            <div className="classic-error">
+              <AlertCircle className="w-4 h-4 text-[#dd4b39] shrink-0" />
               <span>{error}</span>
             </div>
           )}
@@ -143,97 +143,97 @@ export default function CreateUserModal({ isOpen, onClose, onUserCreated }) {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1">
-                  Username *
+                <label className="classic-label">
+                  Username <span className="text-[#dd4b39]">*</span>
                 </label>
                 <div className="relative">
-                  <User className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-2.5 pointer-events-none" />
+                  <User className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5 pointer-events-none" />
                   <input
                     type="text"
                     required
                     value={formData.username}
                     onChange={(e) => setFormData({ ...formData, username: e.target.value })}
                     placeholder="e.g. teller.dara"
-                    className="w-full pl-8 pr-3 py-2 rounded border border-gray-300 bg-white text-gray-800 text-xs focus:outline-none focus:border-blue-500 font-mono shadow-2xs"
+                    className="classic-input pl-8 font-mono"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1">
-                  {lang === 'kh' ? 'លេខទូរស័ព្ទ *' : 'Phone Number *'}
+                <label className="classic-label">
+                  {lang === 'kh' ? 'លេខទូរស័ព្ទ' : 'Phone Number'} <span className="text-[#dd4b39]">*</span>
                 </label>
                 <div className="relative">
-                  <Phone className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-2.5 pointer-events-none" />
+                  <Phone className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5 pointer-events-none" />
                   <input
                     type="tel"
                     required
                     value={formData.phoneNumber}
                     onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
                     placeholder="e.g. 012888777"
-                    className="w-full pl-8 pr-3 py-2 rounded border border-gray-300 bg-white text-gray-800 text-xs focus:outline-none focus:border-blue-500 font-mono shadow-2xs"
+                    className="classic-input pl-8 font-mono"
                   />
                 </div>
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">
+              <label className="classic-label">
                 {lang === 'kh' ? 'អាសយដ្ឋានអ៊ីមែល' : 'Email Address'}
               </label>
               <div className="relative">
-                <Mail className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-2.5 pointer-events-none" />
+                <Mail className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5 pointer-events-none" />
                 <input
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   placeholder="dara.chan@trustbank.com"
-                  className="w-full pl-8 pr-3 py-2 rounded border border-gray-300 bg-white text-gray-800 text-xs focus:outline-none focus:border-blue-500 shadow-2xs"
+                  className="classic-input pl-8"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1">
-                  {lang === 'kh' ? 'តួនាទី & សិទ្ធិប្រើប្រាស់ *' : 'Role & Permissions *'}
+                <label className="classic-label">
+                  {lang === 'kh' ? 'តួនាទី & សិទ្ធិប្រើប្រាស់' : 'Role & Permissions'} <span className="text-[#dd4b39]">*</span>
                 </label>
                 <div className="relative">
                   <select
                     required
                     value={formData.role}
                     onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                    className="appearance-none w-full pl-3 pr-8 py-2 rounded border border-gray-300 bg-white text-gray-800 text-xs focus:outline-none focus:border-blue-500 shadow-2xs cursor-pointer"
+                    className="classic-input appearance-none pr-8 cursor-pointer"
                   >
                     <option value="" disabled>Select...</option>
                     <option value="TELLER">TELLER (Cash & Operations)</option>
                     <option value="ADMIN">ADMIN (Full Security Access)</option>
                     <option value="COMPLIANCE">COMPLIANCE OFFICER</option>
                   </select>
-                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2.5 text-gray-400">
-                    <ChevronDown className="w-4 h-4 text-gray-500" />
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2.5 text-slate-500">
+                    <ChevronDown className="w-4 h-4" />
                   </div>
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1">
-                  {lang === 'kh' ? 'សាខាបម្រើការងារ *' : 'Branch Assignment *'}
+                <label className="classic-label">
+                  {lang === 'kh' ? 'សាខាបម្រើការងារ' : 'Branch Assignment'} <span className="text-[#dd4b39]">*</span>
                 </label>
                 <div className="relative">
                   <select
                     required
                     value={formData.branch}
                     onChange={(e) => setFormData({ ...formData, branch: e.target.value })}
-                    className="appearance-none w-full pl-3 pr-8 py-2 rounded border border-gray-300 bg-white text-gray-800 text-xs focus:outline-none focus:border-blue-500 shadow-2xs cursor-pointer"
+                    className="classic-input appearance-none pr-8 cursor-pointer"
                   >
                     <option value="" disabled>Select...</option>
                     <option value="Head Office (Phnom Penh)">Head Office (Phnom Penh)</option>
                     <option value="Tuol Kouk Branch">Tuol Kouk Branch</option>
                     <option value="BKK1 Branch">BKK1 Branch</option>
                   </select>
-                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2.5 text-gray-400">
-                    <ChevronDown className="w-4 h-4 text-gray-500" />
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2.5 text-slate-500">
+                    <ChevronDown className="w-4 h-4" />
                   </div>
                 </div>
               </div>
@@ -242,69 +242,69 @@ export default function CreateUserModal({ isOpen, onClose, onUserCreated }) {
             {/* Password & Confirm Password */}
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1">
-                  Password * (Min 6 chars)
+                <label className="classic-label">
+                  Password (Min 6 chars) <span className="text-[#dd4b39]">*</span>
                 </label>
                 <div className="relative">
-                  <Lock className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-2.5 pointer-events-none" />
+                  <Lock className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5 pointer-events-none" />
                   <input
                     type={showPassword ? 'text' : 'password'}
                     required
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                     placeholder="••••••••"
-                    className="w-full pl-8 pr-9 py-2 rounded border border-gray-300 bg-white text-gray-800 text-xs focus:outline-none focus:border-blue-500 shadow-2xs"
+                    className="classic-input pl-8 pr-9"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(prev => !prev)}
-                    className="absolute right-2.5 top-2.5 text-gray-400 hover:text-gray-700 transition-colors cursor-pointer"
+                    className="absolute right-2.5 top-2.5 text-slate-400 hover:text-slate-800 transition-colors cursor-pointer"
                     title={showPassword ? 'Hide password' : 'Show password'}
                   >
-                    {showPassword ? <EyeOff className="w-3.5 h-3.5 text-blue-600" /> : <Eye className="w-3.5 h-3.5" />}
+                    {showPassword ? <EyeOff className="w-3.5 h-3.5 text-slate-800" /> : <Eye className="w-3.5 h-3.5" />}
                   </button>
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1">
-                  Confirm Password *
+                <label className="classic-label">
+                  Confirm Password <span className="text-[#dd4b39]">*</span>
                 </label>
                 <div className="relative">
-                  <Lock className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-2.5 pointer-events-none" />
+                  <Lock className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5 pointer-events-none" />
                   <input
                     type={showConfirmPassword ? 'text' : 'password'}
                     required
                     value={formData.confirmPassword}
                     onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                     placeholder="••••••••"
-                    className="w-full pl-8 pr-9 py-2 rounded border border-gray-300 bg-white text-gray-800 text-xs focus:outline-none focus:border-blue-500 shadow-2xs"
+                    className="classic-input pl-8 pr-9"
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(prev => !prev)}
-                    className="absolute right-2.5 top-2.5 text-gray-400 hover:text-gray-700 transition-colors cursor-pointer"
+                    className="absolute right-2.5 top-2.5 text-slate-400 hover:text-slate-800 transition-colors cursor-pointer"
                     title={showConfirmPassword ? 'Hide password' : 'Show password'}
                   >
-                    {showConfirmPassword ? <EyeOff className="w-3.5 h-3.5 text-blue-600" /> : <Eye className="w-3.5 h-3.5" />}
+                    {showConfirmPassword ? <EyeOff className="w-3.5 h-3.5 text-slate-800" /> : <Eye className="w-3.5 h-3.5" />}
                   </button>
                 </div>
               </div>
             </div>
 
             {/* Modal Actions */}
-            <div className="pt-2 flex items-center justify-end gap-2 border-t border-gray-100">
+            <div className="classic-footer">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 rounded-lg text-xs font-semibold text-gray-700 bg-white hover:bg-gray-100 border border-gray-300 transition-colors shadow-2xs cursor-pointer"
+                className="classic-btn-secondary"
               >
                 {lang === 'kh' ? 'បោះបង់' : 'Cancel'}
               </button>
               <button
                 type="submit"
                 disabled={loading}
-                className="flex items-center gap-1.5 px-5 py-2 rounded-lg text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-2xs transition-all cursor-pointer disabled:opacity-60"
+                className="classic-btn-primary"
               >
                 {loading ? (
                   <>

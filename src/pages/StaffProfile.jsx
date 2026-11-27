@@ -201,135 +201,139 @@ export default function StaffProfile({ onNotify }) {
 
         {/* Change Password Form (7 Cols on Desktop) */}
         <div className="lg:col-span-7">
-          <div className="bg-white rounded-lg border border-gray-200 shadow-xs p-6 relative">
-            <div className="flex items-center gap-3 pb-4 border-b border-gray-100">
-              <div className="w-9 h-9 rounded-lg bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600 shrink-0">
-                <KeyRound className="w-4 h-4" />
-              </div>
-              <div>
-                <h3 className="text-base font-semibold text-gray-800">
-                  {lang === 'kh' ? 'ផ្លាស់ប្តូរលេខសម្ងាត់ថ្មី' : 'Change Security Password'}
-                </h3>
-                <p className="text-xs text-gray-500 mt-0.5">
-                  {lang === 'kh'
-                    ? 'កំណត់លេខសម្ងាត់ថ្មីសម្រាប់គណនីរបស់អ្នកដើម្បីបង្កើនសុវត្ថិភាព'
-                    : 'Update your officer account authentication key with high-entropy pass'}
-                </p>
+          <div className="classic-form-card relative">
+            <div className="classic-header">
+              <div className="flex items-center gap-3">
+                <div className="classic-header-icon">
+                  <KeyRound className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-slate-800 tracking-wide">
+                    {lang === 'kh' ? 'ផ្លាស់ប្តូរលេខសម្ងាត់ថ្មី' : 'Change Security Password'}
+                  </h3>
+                  <p className="text-[11px] text-slate-500 mt-0.5">
+                    {lang === 'kh'
+                      ? 'កំណត់លេខសម្ងាត់ថ្មីសម្រាប់គណនីរបស់អ្នកដើម្បីបង្កើនសុវត្ថិភាព'
+                      : 'Update your officer account authentication key with high-entropy pass'}
+                  </p>
+                </div>
               </div>
             </div>
 
-            {/* Error Message */}
-            {error && (
-              <div className="mt-4 p-3 rounded-md bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2.5">
-                <AlertCircle className="w-4 h-4 text-rose-500 shrink-0" />
-                <span>{error}</span>
-              </div>
-            )}
+            <div className="p-6">
+              {/* Error Message */}
+              {error && (
+                <div className="classic-error mb-4">
+                  <AlertCircle className="w-4 h-4 text-[#dd4b39] shrink-0" />
+                  <span>{error}</span>
+                </div>
+              )}
 
-            {/* Success Message */}
-            {success && (
-              <div className="mt-4 p-3 rounded-md bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs flex items-center gap-2.5">
-                <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                <span>{success}</span>
-              </div>
-            )}
+              {/* Success Message */}
+              {success && (
+                <div className="mb-4 p-3 rounded-[2px] bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs flex items-center gap-2.5">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>{success}</span>
+                </div>
+              )}
 
-            <form onSubmit={handlePasswordSubmit} className="mt-5 space-y-4">
-              {/* Current Password */}
-              <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1">
-                  {lang === 'kh' ? 'លេខសម្ងាត់បច្ចុប្បន្ន' : 'Current Password'} <span className="text-rose-500">*</span>
-                </label>
-                <div className="relative">
-                  <Lock className="w-4 h-4 text-gray-400 absolute left-3 top-2.5" />
-                  <input
-                    type={showCurrent ? 'text' : 'password'}
-                    required
-                    value={currentPassword}
-                    onChange={(e) => setCurrentPassword(e.target.value)}
-                    placeholder="••••••••"
-                    className="w-full pl-9 pr-9 py-2 rounded-md bg-white border border-gray-300 text-gray-800 text-xs focus:outline-none focus:border-blue-500 font-mono transition-colors"
-                  />
+              <form onSubmit={handlePasswordSubmit} className="space-y-4">
+                {/* Current Password */}
+                <div>
+                  <label className="classic-label">
+                    {lang === 'kh' ? 'លេខសម្ងាត់បច្ចុប្បន្ន' : 'Current Password'} <span className="text-[#dd4b39]">*</span>
+                  </label>
+                  <div className="relative">
+                    <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+                    <input
+                      type={showCurrent ? 'text' : 'password'}
+                      required
+                      value={currentPassword}
+                      onChange={(e) => setCurrentPassword(e.target.value)}
+                      placeholder="••••••••"
+                      className="classic-input pl-9 pr-9 font-mono"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowCurrent(!showCurrent)}
+                      className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-800 transition-colors cursor-pointer"
+                    >
+                      {showCurrent ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                {/* New Password */}
+                <div>
+                  <label className="classic-label">
+                    {lang === 'kh' ? 'លេខសម្ងាត់ថ្មី (យ៉ាងតិច ៦ តួអក្សរ)' : 'New Password (min 6 characters)'} <span className="text-[#dd4b39]">*</span>
+                  </label>
+                  <div className="relative">
+                    <KeyRound className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+                    <input
+                      type={showNew ? 'text' : 'password'}
+                      required
+                      minLength={6}
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      placeholder="••••••••"
+                      className="classic-input pl-9 pr-9 font-mono"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowNew(!showNew)}
+                      className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-800 transition-colors cursor-pointer"
+                    >
+                      {showNew ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Confirm New Password */}
+                <div>
+                  <label className="classic-label">
+                    {lang === 'kh' ? 'ផ្ទៀងផ្ទាត់លេខសម្ងាត់ថ្មី' : 'Confirm New Password'} <span className="text-[#dd4b39]">*</span>
+                  </label>
+                  <div className="relative">
+                    <KeyRound className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+                    <input
+                      type={showConfirm ? 'text' : 'password'}
+                      required
+                      minLength={6}
+                      value={confirmNewPassword}
+                      onChange={(e) => setConfirmNewPassword(e.target.value)}
+                      placeholder="••••••••"
+                      className="classic-input pl-9 pr-9 font-mono"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirm(!showConfirm)}
+                      className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-800 transition-colors cursor-pointer"
+                    >
+                      {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Submit Button */}
+                <div className="pt-2">
                   <button
-                    type="button"
-                    onClick={() => setShowCurrent(!showCurrent)}
-                    className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600 transition-colors"
+                    type="submit"
+                    disabled={loading}
+                    className="classic-btn-primary w-full py-2.5"
                   >
-                    {showCurrent ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    {loading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <span>{lang === 'kh' ? 'កំពុងផ្លាស់ប្តូរលេខសម្ងាត់...' : 'Updating Password...'}</span>
+                      </>
+                    ) : (
+                      <span>{lang === 'kh' ? 'ធ្វើបច្ចុប្បន្នភាពលេខសម្ងាត់' : 'Update Credentials'}</span>
+                    )}
                   </button>
                 </div>
-              </div>
-
-              {/* New Password */}
-              <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1">
-                  {lang === 'kh' ? 'លេខសម្ងាត់ថ្មី (យ៉ាងតិច ៦ តួអក្សរ)' : 'New Password (min 6 characters)'} <span className="text-rose-500">*</span>
-                </label>
-                <div className="relative">
-                  <KeyRound className="w-4 h-4 text-gray-400 absolute left-3 top-2.5" />
-                  <input
-                    type={showNew ? 'text' : 'password'}
-                    required
-                    minLength={6}
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder="••••••••"
-                    className="w-full pl-9 pr-9 py-2 rounded-md bg-white border border-gray-300 text-gray-800 text-xs focus:outline-none focus:border-blue-500 font-mono transition-colors"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowNew(!showNew)}
-                    className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600 transition-colors"
-                  >
-                    {showNew ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
-              </div>
-
-              {/* Confirm New Password */}
-              <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1">
-                  {lang === 'kh' ? 'ផ្ទៀងផ្ទាត់លេខសម្ងាត់ថ្មី' : 'Confirm New Password'} <span className="text-rose-500">*</span>
-                </label>
-                <div className="relative">
-                  <KeyRound className="w-4 h-4 text-gray-400 absolute left-3 top-2.5" />
-                  <input
-                    type={showConfirm ? 'text' : 'password'}
-                    required
-                    minLength={6}
-                    value={confirmNewPassword}
-                    onChange={(e) => setConfirmNewPassword(e.target.value)}
-                    placeholder="••••••••"
-                    className="w-full pl-9 pr-9 py-2 rounded-md bg-white border border-gray-300 text-gray-800 text-xs focus:outline-none focus:border-blue-500 font-mono transition-colors"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirm(!showConfirm)}
-                    className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600 transition-colors"
-                  >
-                    {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
-              </div>
-
-              {/* Submit Button */}
-              <div className="pt-2">
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full py-2.5 px-4 rounded-md text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors shadow-2xs flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-                >
-                  {loading ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>{lang === 'kh' ? 'កំពុងផ្លាស់ប្តូរលេខសម្ងាត់...' : 'Updating Password...'}</span>
-                    </>
-                  ) : (
-                    <span>{lang === 'kh' ? 'ធ្វើបច្ចុប្បន្នភាពលេខសម្ងាត់' : 'Update Credentials'}</span>
-                  )}
-                </button>
-              </div>
-            </form>
+              </form>
+            </div>
           </div>
         </div>
       </div>

@@ -410,380 +410,398 @@ export default function TellerCounter({
           {/* Active Operation Form (lg:col-span-2) */}
           <div className="lg:col-span-2">
             {activeOp === 'DEPOSIT' && (
-              <div className="bg-white rounded-lg border border-gray-200 shadow-xs p-5 flex flex-col justify-between h-full">
+              <div className="classic-form-card flex flex-col justify-between h-full">
                 <div>
-                  <div className="flex items-center justify-between pb-3 border-b border-gray-100 mb-4">
-                    <div className="flex items-center gap-2">
-                      <ArrowDownCircle className="w-5 h-5 text-emerald-600" />
+                  <div className="classic-header px-5 py-3.5">
+                    <div className="flex items-center gap-3">
+                      <div className="classic-header-icon w-8 h-8">
+                        <ArrowDownCircle className="w-4 h-4" />
+                      </div>
                       <div>
-                        <h3 className="font-semibold text-gray-800 text-sm">
+                        <h3 className="font-bold text-slate-800 text-sm tracking-wide">
                           {lang === 'kh' ? 'ដាក់ប្រាក់ (Cash Deposit)' : 'Cash Deposit Form'}
                         </h3>
-                        <p className="text-[11px] text-gray-500">
+                        <p className="text-[11px] text-slate-500">
                           {lang === 'kh' ? 'បញ្ចូលប្រាក់ចូលទៅក្នុងគណនីអតិថិជនភ្លាមៗជាមួយបង្កាន់ដៃផ្លូវការ' : 'Deposit funds directly into client account with audited teller slip.'}
                         </p>
                       </div>
                     </div>
-                    <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    <span className="text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-[2px] bg-emerald-50 text-emerald-700 border border-emerald-200">
                       CREDIT
                     </span>
                   </div>
 
-                  {depositError && (
-                    <div className="mb-4 p-2.5 rounded bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
-                      <AlertCircle className="w-4 h-4 text-rose-500 shrink-0" />
-                      <span>{depositError}</span>
-                    </div>
-                  )}
+                  <div className="p-5">
+                    {depositError && (
+                      <div className="classic-error mb-4">
+                        <AlertCircle className="w-4 h-4 text-[#dd4b39] shrink-0" />
+                        <span>{depositError}</span>
+                      </div>
+                    )}
 
-                  <form id="teller-deposit-form" onSubmit={handleDeposit} className="space-y-4">
-                    <div>
-                      <label className="block text-xs font-semibold text-gray-700 mb-1">
-                        {t.targetAccount} (Credit) <span className="text-rose-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        list="counterDepositTargetList"
-                        required
-                        value={depositTarget}
-                        onChange={(e) => { setDepositTarget(e.target.value); setDepositError(''); }}
-                        placeholder="Select or enter account..."
-                        className="w-full px-3 py-2 rounded border border-gray-300 bg-white text-gray-800 font-mono text-xs focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 shadow-2xs"
-                      />
-                      <datalist id="counterDepositTargetList">
-                        {accounts.map((acc) => (
-                          <option key={acc.id} value={acc.accountNumber}>
-                            {acc.accountNumber} - {acc.customerName} (${acc.balance?.toLocaleString()})
-                          </option>
-                        ))}
-                      </datalist>
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-semibold text-gray-700 mb-1">
-                        {t.amount} <span className="text-rose-500">*</span>
-                      </label>
-                      <div className="relative">
-                        <span className="absolute left-3 top-2 text-gray-400 font-bold text-xs">$</span>
+                    <form id="teller-deposit-form" onSubmit={handleDeposit} className="space-y-4">
+                      <div>
+                        <label className="classic-label">
+                          {t.targetAccount} (Credit) <span className="text-[#dd4b39]">*</span>
+                        </label>
                         <input
-                          type="number"
-                          step="0.01"
-                          min="0.01"
+                          type="text"
+                          list="counterDepositTargetList"
                           required
-                          value={depositAmount}
-                          onChange={(e) => { setDepositAmount(e.target.value); setDepositError(''); }}
-                          placeholder="0.00"
-                          className="w-full pl-7 pr-3 py-2 rounded border border-gray-300 bg-white text-gray-800 font-mono text-sm font-semibold focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 shadow-2xs"
+                          value={depositTarget}
+                          onChange={(e) => { setDepositTarget(e.target.value); setDepositError(''); }}
+                          placeholder="Select or enter account..."
+                          className="classic-input font-mono"
+                        />
+                        <datalist id="counterDepositTargetList">
+                          {accounts.map((acc) => (
+                            <option key={acc.id} value={acc.accountNumber}>
+                              {acc.accountNumber} - {acc.customerName} (${acc.balance?.toLocaleString()})
+                            </option>
+                          ))}
+                        </datalist>
+                      </div>
+
+                      <div>
+                        <label className="classic-label">
+                          {t.amount} <span className="text-[#dd4b39]">*</span>
+                        </label>
+                        <div className="relative">
+                          <span className="absolute left-3 top-2 text-slate-500 font-bold text-xs">$</span>
+                          <input
+                            type="number"
+                            step="0.01"
+                            min="0.01"
+                            required
+                            value={depositAmount}
+                            onChange={(e) => { setDepositAmount(e.target.value); setDepositError(''); }}
+                            placeholder="0.00"
+                            className="classic-input pl-7 font-mono text-sm font-bold"
+                          />
+                        </div>
+                        <div className="flex flex-wrap items-center gap-1 mt-1.5">
+                          <span className="text-[10px] text-slate-500 font-semibold mr-0.5">Quick:</span>
+                          {quickDepositAmounts.map((q) => (
+                            <button
+                              key={q}
+                              type="button"
+                              onClick={() => setDepositAmount(q.toString())}
+                              className="px-2 py-0.5 rounded-[2px] text-[10px] font-mono font-bold bg-[#f4f4f4] hover:bg-[#e7e7e7] text-slate-700 border border-[#d2d6de] transition-colors cursor-pointer"
+                            >
+                              +${q}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="classic-label">
+                          {t.description} / Memo
+                        </label>
+                        <input
+                          type="text"
+                          value={depositMemo}
+                          onChange={(e) => setDepositMemo(e.target.value)}
+                          placeholder="Deposit memo or remark..."
+                          className="classic-input"
                         />
                       </div>
-                      <div className="flex flex-wrap items-center gap-1 mt-1.5">
-                        <span className="text-[10px] text-gray-400 mr-0.5">Quick:</span>
-                        {quickDepositAmounts.map((q) => (
-                          <button
-                            key={q}
-                            type="button"
-                            onClick={() => setDepositAmount(q.toString())}
-                            className="px-1.5 py-0.5 rounded text-[10px] font-mono font-medium bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300 transition-colors cursor-pointer"
-                          >
-                            +${q}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-semibold text-gray-700 mb-1">
-                        {t.description} / Memo
-                      </label>
-                      <input
-                        type="text"
-                        value={depositMemo}
-                        onChange={(e) => setDepositMemo(e.target.value)}
-                        placeholder="Deposit memo or remark..."
-                        className="w-full px-3 py-2 rounded border border-gray-300 bg-white text-gray-800 text-xs focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 shadow-2xs"
-                      />
-                    </div>
-                  </form>
+                    </form>
+                  </div>
                 </div>
 
-                <button
-                  form="teller-deposit-form"
-                  type="submit"
-                  disabled={submittingType === 'DEPOSIT'}
-                  className="mt-6 w-full py-2.5 rounded text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 shadow-2xs transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70"
-                >
-                  {submittingType === 'DEPOSIT' ? (
-                    <>
-                      <Loader2 className="w-3.5 h-3.5 animate-spin text-white" />
-                      <span>{lang === 'kh' ? 'កំពុងដាក់ប្រាក់...' : 'Depositing...'}</span>
-                    </>
-                  ) : (
-                    <>
-                      <ArrowDownCircle className="w-3.5 h-3.5" />
-                      <span>{lang === 'kh' ? 'អនុវត្តការដាក់ប្រាក់ (Execute Deposit)' : 'Execute Cash Deposit Now'}</span>
-                    </>
-                  )}
-                </button>
+                <div className="px-5 pb-5">
+                  <button
+                    form="teller-deposit-form"
+                    type="submit"
+                    disabled={submittingType === 'DEPOSIT'}
+                    className="classic-btn-deposit w-full py-2.5"
+                  >
+                    {submittingType === 'DEPOSIT' ? (
+                      <>
+                        <Loader2 className="w-3.5 h-3.5 animate-spin text-white" />
+                        <span>{lang === 'kh' ? 'កំពុងដាក់ប្រាក់...' : 'Depositing...'}</span>
+                      </>
+                    ) : (
+                      <>
+                        <ArrowDownCircle className="w-3.5 h-3.5" />
+                        <span>{lang === 'kh' ? 'អនុវត្តការដាក់ប្រាក់ (Execute Deposit)' : 'Execute Cash Deposit Now'}</span>
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
             )}
 
             {activeOp === 'WITHDRAW' && (
-              <div className="bg-white rounded-lg border border-gray-200 shadow-xs p-5 flex flex-col justify-between h-full">
+              <div className="classic-form-card flex flex-col justify-between h-full">
                 <div>
-                  <div className="flex items-center justify-between pb-3 border-b border-gray-100 mb-4">
-                    <div className="flex items-center gap-2">
-                      <ArrowUpCircle className="w-5 h-5 text-amber-500" />
+                  <div className="classic-header px-5 py-3.5">
+                    <div className="flex items-center gap-3">
+                      <div className="classic-header-icon w-8 h-8">
+                        <ArrowUpCircle className="w-4 h-4" />
+                      </div>
                       <div>
-                        <h3 className="font-semibold text-gray-800 text-sm">
+                        <h3 className="font-bold text-slate-800 text-sm tracking-wide">
                           {lang === 'kh' ? 'ដកប្រាក់ (Cash Withdrawal)' : 'Cash Withdrawal Form'}
                         </h3>
-                        <p className="text-[11px] text-gray-500">
+                        <p className="text-[11px] text-slate-500">
                           {lang === 'kh' ? 'ដកប្រាក់ពីគណនីអតិថិជនជាមួយការត្រួតពិនិត្យសមតុល្យ & KYC' : 'Debit funds from client account with live balance verification.'}
                         </p>
                       </div>
                     </div>
-                    <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
+                    <span className="text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-[2px] bg-amber-50 text-amber-700 border border-amber-200">
                       DEBIT
                     </span>
                   </div>
 
-                  {withdrawError && (
-                    <div className="mb-4 p-2.5 rounded bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
-                      <AlertCircle className="w-4 h-4 text-rose-500 shrink-0" />
-                      <span>{withdrawError}</span>
-                    </div>
-                  )}
+                  <div className="p-5">
+                    {withdrawError && (
+                      <div className="classic-error mb-4">
+                        <AlertCircle className="w-4 h-4 text-[#dd4b39] shrink-0" />
+                        <span>{withdrawError}</span>
+                      </div>
+                    )}
 
-                  <form id="teller-withdraw-form" onSubmit={handleWithdraw} className="space-y-4">
-                    <div>
-                      <label className="block text-xs font-semibold text-gray-700 mb-1">
-                        {t.sourceAccount} (Debit) <span className="text-rose-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        list="counterWithdrawSourceList"
-                        required
-                        value={withdrawSource}
-                        onChange={(e) => { setWithdrawSource(e.target.value); setWithdrawError(''); }}
-                        placeholder="Select or enter account..."
-                        className="w-full px-3 py-2 rounded border border-gray-300 bg-white text-gray-800 font-mono text-xs focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 shadow-2xs"
-                      />
-                      <datalist id="counterWithdrawSourceList">
-                        {accounts.map((acc) => (
-                          <option key={acc.id} value={acc.accountNumber}>
-                            {acc.accountNumber} - {acc.customerName} (${acc.balance?.toLocaleString()})
-                          </option>
-                        ))}
-                      </datalist>
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-semibold text-gray-700 mb-1">
-                        {t.amount} <span className="text-rose-500">*</span>
-                      </label>
-                      <div className="relative">
-                        <span className="absolute left-3 top-2 text-gray-400 font-bold text-xs">$</span>
+                    <form id="teller-withdraw-form" onSubmit={handleWithdraw} className="space-y-4">
+                      <div>
+                        <label className="classic-label">
+                          {t.sourceAccount} (Debit) <span className="text-[#dd4b39]">*</span>
+                        </label>
                         <input
-                          type="number"
-                          step="0.01"
-                          min="0.01"
+                          type="text"
+                          list="counterWithdrawSourceList"
                           required
-                          value={withdrawAmount}
-                          onChange={(e) => { setWithdrawAmount(e.target.value); setWithdrawError(''); }}
-                          placeholder="0.00"
-                          className="w-full pl-7 pr-3 py-2 rounded border border-gray-300 bg-white text-gray-800 font-mono text-sm font-semibold focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 shadow-2xs"
+                          value={withdrawSource}
+                          onChange={(e) => { setWithdrawSource(e.target.value); setWithdrawError(''); }}
+                          placeholder="Select or enter account..."
+                          className="classic-input font-mono"
+                        />
+                        <datalist id="counterWithdrawSourceList">
+                          {accounts.map((acc) => (
+                            <option key={acc.id} value={acc.accountNumber}>
+                              {acc.accountNumber} - {acc.customerName} (${acc.balance?.toLocaleString()})
+                            </option>
+                          ))}
+                        </datalist>
+                      </div>
+
+                      <div>
+                        <label className="classic-label">
+                          {t.amount} <span className="text-[#dd4b39]">*</span>
+                        </label>
+                        <div className="relative">
+                          <span className="absolute left-3 top-2 text-slate-500 font-bold text-xs">$</span>
+                          <input
+                            type="number"
+                            step="0.01"
+                            min="0.01"
+                            required
+                            value={withdrawAmount}
+                            onChange={(e) => { setWithdrawAmount(e.target.value); setWithdrawError(''); }}
+                            placeholder="0.00"
+                            className="classic-input pl-7 font-mono text-sm font-bold"
+                          />
+                        </div>
+                        <div className="flex flex-wrap items-center gap-1 mt-1.5">
+                          <span className="text-[10px] text-slate-500 font-semibold mr-0.5">Quick:</span>
+                          {quickWithdrawAmounts.map((q) => (
+                            <button
+                              key={q}
+                              type="button"
+                              onClick={() => setWithdrawAmount(q.toString())}
+                              className="px-2 py-0.5 rounded-[2px] text-[10px] font-mono font-bold bg-[#f4f4f4] hover:bg-[#e7e7e7] text-slate-700 border border-[#d2d6de] transition-colors cursor-pointer"
+                            >
+                              +${q}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="classic-label">
+                          {t.description} / Memo
+                        </label>
+                        <input
+                          type="text"
+                          value={withdrawMemo}
+                          onChange={(e) => setWithdrawMemo(e.target.value)}
+                          placeholder="Withdrawal memo..."
+                          className="classic-input"
                         />
                       </div>
-                      <div className="flex flex-wrap items-center gap-1 mt-1.5">
-                        <span className="text-[10px] text-gray-400 mr-0.5">Quick:</span>
-                        {quickWithdrawAmounts.map((q) => (
-                          <button
-                            key={q}
-                            type="button"
-                            onClick={() => setWithdrawAmount(q.toString())}
-                            className="px-1.5 py-0.5 rounded text-[10px] font-mono font-medium bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300 transition-colors cursor-pointer"
-                          >
-                            +${q}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-semibold text-gray-700 mb-1">
-                        {t.description} / Memo
-                      </label>
-                      <input
-                        type="text"
-                        value={withdrawMemo}
-                        onChange={(e) => setWithdrawMemo(e.target.value)}
-                        placeholder="Withdrawal memo..."
-                        className="w-full px-3 py-2 rounded border border-gray-300 bg-white text-gray-800 text-xs focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 shadow-2xs"
-                      />
-                    </div>
-                  </form>
+                    </form>
+                  </div>
                 </div>
 
-                <button
-                  form="teller-withdraw-form"
-                  type="submit"
-                  disabled={submittingType === 'WITHDRAW'}
-                  className="mt-6 w-full py-2.5 rounded text-xs font-semibold text-white bg-amber-500 hover:bg-amber-600 shadow-2xs transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70"
-                >
-                  {submittingType === 'WITHDRAW' ? (
-                    <>
-                      <Loader2 className="w-3.5 h-3.5 animate-spin text-white" />
-                      <span>{lang === 'kh' ? 'កំពុងដកប្រាក់...' : 'Withdrawing...'}</span>
-                    </>
-                  ) : (
-                    <>
-                      <ArrowUpCircle className="w-3.5 h-3.5" />
-                      <span>{lang === 'kh' ? 'អនុវត្តការដកប្រាក់ (Execute Withdraw)' : 'Execute Cash Withdrawal Now'}</span>
-                    </>
-                  )}
-                </button>
+                <div className="px-5 pb-5">
+                  <button
+                    form="teller-withdraw-form"
+                    type="submit"
+                    disabled={submittingType === 'WITHDRAW'}
+                    className="classic-btn-withdraw w-full py-2.5"
+                  >
+                    {submittingType === 'WITHDRAW' ? (
+                      <>
+                        <Loader2 className="w-3.5 h-3.5 animate-spin text-white" />
+                        <span>{lang === 'kh' ? 'កំពុងដកប្រាក់...' : 'Withdrawing...'}</span>
+                      </>
+                    ) : (
+                      <>
+                        <ArrowUpCircle className="w-3.5 h-3.5" />
+                        <span>{lang === 'kh' ? 'អនុវត្តការដកប្រាក់ (Execute Withdraw)' : 'Execute Cash Withdrawal Now'}</span>
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
             )}
 
             {activeOp === 'TRANSFER' && (
-              <div className="bg-white rounded-lg border border-gray-200 shadow-xs p-5 flex flex-col justify-between h-full">
+              <div className="classic-form-card flex flex-col justify-between h-full">
                 <div>
-                  <div className="flex items-center justify-between pb-3 border-b border-gray-100 mb-4">
-                    <div className="flex items-center gap-2">
-                      <ArrowRightLeft className="w-5 h-5 text-blue-600" />
+                  <div className="classic-header px-5 py-3.5">
+                    <div className="flex items-center gap-3">
+                      <div className="classic-header-icon w-8 h-8">
+                        <ArrowRightLeft className="w-4 h-4" />
+                      </div>
                       <div>
-                        <h3 className="font-semibold text-gray-800 text-sm">
+                        <h3 className="font-bold text-slate-800 text-sm tracking-wide">
                           {lang === 'kh' ? 'ផ្ទេរប្រាក់ (Account Transfer)' : 'Account Transfer Form'}
                         </h3>
-                        <p className="text-[11px] text-gray-500">
+                        <p className="text-[11px] text-slate-500">
                           {lang === 'kh' ? 'ផ្ទេរប្រាក់ភ្លាមៗរវាងគណនីក្នុងប្រព័ន្ធជាមួយការកាត់កងស្វ័យប្រវត្តិ' : 'Direct inter-account movement with real-time settlement.'}
                         </p>
                       </div>
                     </div>
-                    <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+                    <span className="text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-[2px] bg-blue-50 text-[#3c8dbc] border border-blue-200">
                       INTERNAL
                     </span>
                   </div>
 
-                  {transferError && (
-                    <div className="mb-4 p-2.5 rounded bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
-                      <AlertCircle className="w-4 h-4 text-rose-500 shrink-0" />
-                      <span>{transferError}</span>
-                    </div>
-                  )}
+                  <div className="p-5">
+                    {transferError && (
+                      <div className="classic-error mb-4">
+                        <AlertCircle className="w-4 h-4 text-[#dd4b39] shrink-0" />
+                        <span>{transferError}</span>
+                      </div>
+                    )}
 
-                  <form id="teller-transfer-form" onSubmit={handleTransfer} className="space-y-4">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-xs font-semibold text-gray-700 mb-1">
-                          {t.sourceAccount} (Debit) <span className="text-rose-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          list="counterTransferSourceList"
-                          required
-                          value={transferSource}
-                          onChange={(e) => { setTransferSource(e.target.value); setTransferError(''); }}
-                          placeholder="Source account..."
-                          className="w-full px-3 py-2 rounded border border-gray-300 bg-white text-gray-800 font-mono text-xs focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-2xs"
-                        />
-                        <datalist id="counterTransferSourceList">
-                          {accounts.map((acc) => (
-                            <option key={acc.id} value={acc.accountNumber}>
-                              {acc.accountNumber} - {acc.customerName} (${acc.balance?.toLocaleString()})
-                            </option>
-                          ))}
-                        </datalist>
+                    <form id="teller-transfer-form" onSubmit={handleTransfer} className="space-y-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <label className="classic-label">
+                            {t.sourceAccount} (Debit) <span className="text-[#dd4b39]">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            list="counterTransferSourceList"
+                            required
+                            value={transferSource}
+                            onChange={(e) => { setTransferSource(e.target.value); setTransferError(''); }}
+                            placeholder="Source account..."
+                            className="classic-input font-mono"
+                          />
+                          <datalist id="counterTransferSourceList">
+                            {accounts.map((acc) => (
+                              <option key={acc.id} value={acc.accountNumber}>
+                                {acc.accountNumber} - {acc.customerName} (${acc.balance?.toLocaleString()})
+                              </option>
+                            ))}
+                          </datalist>
+                        </div>
+
+                        <div>
+                          <label className="classic-label">
+                            {t.targetAccount} (Credit) <span className="text-[#dd4b39]">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            list="counterTransferTargetList"
+                            required
+                            value={transferTarget}
+                            onChange={(e) => { setTransferTarget(e.target.value); setTransferError(''); }}
+                            placeholder="Target account..."
+                            className="classic-input font-mono"
+                          />
+                          <datalist id="counterTransferTargetList">
+                            {accounts.map((acc) => (
+                              <option key={acc.id} value={acc.accountNumber}>
+                                {acc.accountNumber} - {acc.customerName} (${acc.balance?.toLocaleString()})
+                              </option>
+                            ))}
+                          </datalist>
+                        </div>
                       </div>
 
                       <div>
-                        <label className="block text-xs font-semibold text-gray-700 mb-1">
-                          {t.targetAccount} (Credit) <span className="text-rose-500">*</span>
+                        <label className="classic-label">
+                          {t.amount} <span className="text-[#dd4b39]">*</span>
+                        </label>
+                        <div className="relative">
+                          <span className="absolute left-3 top-2 text-slate-500 font-bold text-xs">$</span>
+                          <input
+                            type="number"
+                            step="0.01"
+                            min="0.01"
+                            required
+                            value={transferAmount}
+                            onChange={(e) => { setTransferAmount(e.target.value); setTransferError(''); }}
+                            placeholder="0.00"
+                            className="classic-input pl-7 font-mono text-sm font-bold"
+                          />
+                        </div>
+                        <div className="flex flex-wrap items-center gap-1 mt-1.5">
+                          <span className="text-[10px] text-slate-500 font-semibold mr-0.5">Quick:</span>
+                          {quickTransferAmounts.map((q) => (
+                            <button
+                              key={q}
+                              type="button"
+                              onClick={() => setTransferAmount(q.toString())}
+                              className="px-2 py-0.5 rounded-[2px] text-[10px] font-mono font-bold bg-[#f4f4f4] hover:bg-[#e7e7e7] text-slate-700 border border-[#d2d6de] transition-colors cursor-pointer"
+                            >
+                              +${q}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="classic-label">
+                          {t.description} / Memo
                         </label>
                         <input
                           type="text"
-                          list="counterTransferTargetList"
-                          required
-                          value={transferTarget}
-                          onChange={(e) => { setTransferTarget(e.target.value); setTransferError(''); }}
-                          placeholder="Target account..."
-                          className="w-full px-3 py-2 rounded border border-gray-300 bg-white text-gray-800 font-mono text-xs focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-2xs"
-                        />
-                        <datalist id="counterTransferTargetList">
-                          {accounts.map((acc) => (
-                            <option key={acc.id} value={acc.accountNumber}>
-                              {acc.accountNumber} - {acc.customerName} (${acc.balance?.toLocaleString()})
-                            </option>
-                          ))}
-                        </datalist>
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-semibold text-gray-700 mb-1">
-                        {t.amount} <span className="text-rose-500">*</span>
-                      </label>
-                      <div className="relative">
-                        <span className="absolute left-3 top-2 text-gray-400 font-bold text-xs">$</span>
-                        <input
-                          type="number"
-                          step="0.01"
-                          min="0.01"
-                          required
-                          value={transferAmount}
-                          onChange={(e) => { setTransferAmount(e.target.value); setTransferError(''); }}
-                          placeholder="0.00"
-                          className="w-full pl-7 pr-3 py-2 rounded border border-gray-300 bg-white text-gray-800 font-mono text-sm font-semibold focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-2xs"
+                          value={transferMemo}
+                          onChange={(e) => setTransferMemo(e.target.value)}
+                          placeholder="Transfer description..."
+                          className="classic-input"
                         />
                       </div>
-                      <div className="flex flex-wrap items-center gap-1 mt-1.5">
-                        <span className="text-[10px] text-gray-400 mr-0.5">Quick:</span>
-                        {quickTransferAmounts.map((q) => (
-                          <button
-                            key={q}
-                            type="button"
-                            onClick={() => setTransferAmount(q.toString())}
-                            className="px-1.5 py-0.5 rounded text-[10px] font-mono font-medium bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300 transition-colors cursor-pointer"
-                          >
-                            +${q}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-semibold text-gray-700 mb-1">
-                        {t.description} / Memo
-                      </label>
-                      <input
-                        type="text"
-                        value={transferMemo}
-                        onChange={(e) => setTransferMemo(e.target.value)}
-                        placeholder="Transfer description..."
-                        className="w-full px-3 py-2 rounded border border-gray-300 bg-white text-gray-800 text-xs focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-2xs"
-                      />
-                    </div>
-                  </form>
+                    </form>
+                  </div>
                 </div>
 
-                <button
-                  form="teller-transfer-form"
-                  type="submit"
-                  disabled={submittingType === 'TRANSFER'}
-                  className="mt-6 w-full py-2.5 rounded text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 shadow-2xs transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70"
-                >
-                  {submittingType === 'TRANSFER' ? (
-                    <>
-                      <Loader2 className="w-3.5 h-3.5 animate-spin text-white" />
-                      <span>{lang === 'kh' ? 'កំពុងផ្ទេរ...' : 'Transferring...'}</span>
-                    </>
-                  ) : (
-                    <>
-                      <ArrowRightLeft className="w-3.5 h-3.5" />
-                      <span>{lang === 'kh' ? 'អនុវត្តការផ្ទេរប្រាក់ (Execute Transfer)' : 'Execute Account Transfer Now'}</span>
-                    </>
-                  )}
-                </button>
+                <div className="px-5 pb-5">
+                  <button
+                    form="teller-transfer-form"
+                    type="submit"
+                    disabled={submittingType === 'TRANSFER'}
+                    className="classic-btn-primary w-full py-2.5"
+                  >
+                    {submittingType === 'TRANSFER' ? (
+                      <>
+                        <Loader2 className="w-3.5 h-3.5 animate-spin text-white" />
+                        <span>{lang === 'kh' ? 'កំពុងផ្ទេរ...' : 'Transferring...'}</span>
+                      </>
+                    ) : (
+                      <>
+                        <ArrowRightLeft className="w-3.5 h-3.5" />
+                        <span>{lang === 'kh' ? 'អនុវត្តការផ្ទេរប្រាក់ (Execute Transfer)' : 'Execute Account Transfer Now'}</span>
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
             )}
           </div>

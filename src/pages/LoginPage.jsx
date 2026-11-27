@@ -224,13 +224,13 @@ export default function LoginPage({ onLoginSuccess, onSkipToDemo }) {
         </div>
       </div>
 
-      {/* RIGHT COLUMN: Modern High-Contrast Login Card */}
-      <div className="w-full lg:w-5/12 flex flex-col justify-between p-6 sm:p-10 lg:p-12 bg-[#0b1120] relative z-20">
-        {/* Top Header Utilities (Lang & Theme) */}
+      {/* RIGHT COLUMN: Classic ERP Login Form */}
+      <div className="w-full lg:w-5/12 flex flex-col justify-between p-6 sm:p-10 lg:p-12 bg-[#ecf0f5] text-slate-800 relative z-20 border-l border-[#d2d6de]">
+        {/* Top Header Utilities (Lang) */}
         <div className="flex items-center justify-between pb-6">
           <div className="lg:hidden flex items-center gap-2">
             <BankLogo size={28} />
-            <span className="font-extrabold text-sm text-white tracking-wider">
+            <span className="font-extrabold text-sm text-[#3c8dbc] tracking-wider">
               TRUST BANK
             </span>
           </div>
@@ -240,107 +240,108 @@ export default function LoginPage({ onLoginSuccess, onSkipToDemo }) {
             <button
               type="button"
               onClick={() => setLang(lang === 'en' ? 'kh' : 'en')}
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-800/80 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-colors cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-1 rounded-[2px] text-xs font-semibold bg-white hover:bg-slate-50 text-[#3c8dbc] border border-[#d2d6de] transition-colors cursor-pointer shadow-2xs"
             >
-              <Globe2 className="w-3.5 h-3.5 text-blue-400" />
+              <Globe2 className="w-3.5 h-3.5 text-[#3c8dbc]" />
               <span>{lang === 'en' ? 'EN' : 'ខ្មែរ'}</span>
             </button>
           </div>
         </div>
 
         {/* Main Center Form */}
-        <div className="max-w-md w-full mx-auto my-auto py-6">
-          <div className="mb-6 text-center flex flex-col items-center">
-            <div className="w-14 h-14 rounded-2xl bg-blue-600/10 border border-blue-500/30 flex items-center justify-center mb-4 text-blue-400 shadow-lg shadow-blue-500/10">
-              <KeyRound className="w-7 h-7" />
+        <div className="max-w-md w-full mx-auto my-auto classic-modal">
+          <div className="classic-header justify-center text-center flex-col gap-2 py-5">
+            <div className="classic-header-icon w-12 h-12">
+              <KeyRound className="w-6 h-6" />
             </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-white">
-              {lang === 'kh' ? 'ចូលប្រើប្រាស់ប្រព័ន្ធ' : 'Sign in to Terminal'}
-            </h2>
-            <p className="text-xs text-slate-400 mt-1.5 max-w-sm mx-auto">
-              {lang === 'kh' 
-                ? 'សូមបញ្ចូលឈ្មោះ និងលេខសម្ងាត់របស់មន្ត្រីធនាគារ' 
-                : 'Enter your core banking credentials to access the terminal workstation.'}
-            </p>
+            <div>
+              <h2 className="text-xl sm:text-2xl font-bold text-[#333333]">
+                {lang === 'kh' ? 'ចូលប្រើប្រាស់ប្រព័ន្ធ' : 'Sign in to Terminal'}
+              </h2>
+              <p className="text-xs text-slate-500 mt-1 max-w-xs mx-auto">
+                {lang === 'kh' 
+                  ? 'សូមបញ្ចូលឈ្មោះ និងលេខសម្ងាត់របស់មន្ត្រីធនាគារ' 
+                  : 'Enter your core banking credentials to access the terminal workstation.'}
+              </p>
+            </div>
           </div>
 
-          {authAlert && !error && (
-            <div className="mb-4 p-3 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 shrink-0" />
-              <span>{t[authAlert] || authAlert}</span>
-            </div>
-          )}
-
-          {error && (
-            <div className="mb-4 p-3 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 shrink-0" />
-              <span>{error}</span>
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                {lang === 'kh' ? 'ឈ្មោះអ្នកប្រើប្រាស់ ឬ អ៊ីមែល' : 'Username or Email'} <span className="text-rose-400">*</span>
-              </label>
-              <div className="relative">
-                <User className="w-4 h-4 text-slate-500 absolute left-3.5 top-3" />
-                <input
-                  type="text"
-                  required
-                  value={identifier}
-                  onChange={(e) => setIdentifier(e.target.value)}
-                  placeholder={lang === 'kh' ? 'បញ្ចូលឈ្មោះអ្នកប្រើប្រាស់ ឬ អ៊ីមែល...' : 'Enter your username or email...'}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-700/80 text-white text-sm focus:outline-none focus:border-blue-500 font-mono transition-colors shadow-2xs"
-                />
+          <div className="p-6">
+            {authAlert && !error && (
+              <div className="mb-4 p-2.5 rounded-[2px] bg-amber-50 border border-amber-200 text-amber-800 text-xs flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <span>{t[authAlert] || authAlert}</span>
               </div>
-            </div>
+            )}
 
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                {lang === 'kh' ? 'លេខសម្ងាត់' : 'Password'} <span className="text-rose-400">*</span>
-              </label>
-              <div className="relative">
-                <Lock className="w-4 h-4 text-slate-500 absolute left-3.5 top-3" />
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-slate-900/90 border border-slate-700/80 text-white text-sm focus:outline-none focus:border-blue-500 transition-colors font-mono shadow-2xs"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3.5 top-3 text-slate-400 hover:text-slate-200 transition-colors cursor-pointer"
-                >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
+            {error && (
+              <div className="classic-error mb-4">
+                <AlertCircle className="w-4 h-4 text-[#dd4b39] shrink-0" />
+                <span>{error}</span>
               </div>
-            </div>
+            )}
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-3 rounded-xl text-xs font-bold text-white shadow-xl transition-all flex items-center justify-center gap-2 mt-4 cursor-pointer group active:scale-[0.99]"
-              style={{
-                background: `linear-gradient(135deg, ${theme.primary}, ${theme.primaryLight})`,
-              }}
-            >
-              <KeyRound className="w-4 h-4 transition-transform group-hover:rotate-45" />
-              <span>
-                {loading 
-                  ? (lang === 'kh' ? 'កំពុងផ្ទៀងផ្ទាត់...' : 'Signing in...') 
-                  : (lang === 'kh' ? 'ចូលប្រើប្រាស់ប្រព័ន្ធ' : 'Sign In to Terminal')}
-              </span>
-              <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
-            </button>
-          </form>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="classic-label">
+                  {lang === 'kh' ? 'ឈ្មោះអ្នកប្រើប្រាស់ ឬ អ៊ីមែល' : 'Username or Email'} <span className="text-[#dd4b39]">*</span>
+                </label>
+                <div className="relative">
+                  <User className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+                  <input
+                    type="text"
+                    required
+                    value={identifier}
+                    onChange={(e) => setIdentifier(e.target.value)}
+                    placeholder={lang === 'kh' ? 'បញ្ចូលឈ្មោះអ្នកប្រើប្រាស់ ឬ អ៊ីមែល...' : 'Enter your username or email...'}
+                    className="classic-input pl-9 pr-4 py-2.5 font-mono"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="classic-label">
+                  {lang === 'kh' ? 'លេខសម្ងាត់' : 'Password'} <span className="text-[#dd4b39]">*</span>
+                </label>
+                <div className="relative">
+                  <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    className="classic-input pl-9 pr-10 py-2.5 font-mono"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-2.5 text-slate-400 hover:text-[#3c8dbc] transition-colors cursor-pointer"
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="classic-btn-primary w-full py-2.5 mt-2 group"
+              >
+                <KeyRound className="w-4 h-4 transition-transform group-hover:rotate-45" />
+                <span>
+                  {loading 
+                    ? (lang === 'kh' ? 'កំពុងផ្ទៀងផ្ទាត់...' : 'Signing in...') 
+                    : (lang === 'kh' ? 'ចូលប្រើប្រាស់ប្រព័ន្ធ' : 'Sign In to Terminal')}
+                </span>
+                <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
+              </button>
+            </form>
+          </div>
         </div>
 
         {/* Right Column Footer */}
-        <div className="text-center text-[11px] text-slate-500 pt-4">
+        <div className="text-center text-[11px] text-slate-500 pt-4 font-medium">
           <span>{lang === 'kh' ? 'សម្រាប់តែមន្ត្រីធនាគារដែលទទួលបានការអនុញ្ញាត • សាខាកណ្តាល' : 'Authorized Banking Personnel Only • Central Terminal'}</span>
         </div>
       </div>

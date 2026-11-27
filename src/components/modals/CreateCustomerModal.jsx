@@ -63,23 +63,23 @@ export default function CreateCustomerModal({ isOpen, onClose, onSuccess }) {
   };
 
   return createPortal(
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-fadeIn" onClick={handleClose}>
-      <div className="w-full max-w-lg bg-white border border-gray-200 rounded-xl shadow-2xl overflow-hidden" onClick={(e) => e.stopPropagation()}>
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#0b1322]/60 backdrop-blur-[1px] animate-fadeIn" onClick={handleClose}>
+      <div className="w-full max-w-lg classic-modal" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
-        <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between bg-gray-50/90">
+        <div className="classic-header">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 border border-blue-200 flex items-center justify-center shadow-2xs">
+            <div className="classic-header-icon">
               <UserCheck className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-bold text-gray-900 text-base">{t.newCustomerModalTitle || 'New Customer KYC Profile'}</h3>
-              <p className="text-xs text-gray-500 mt-0.5">KYC Compliance & Regulatory Registry</p>
+              <h3 className="font-bold text-slate-800 text-base tracking-wide">{t.newCustomerModalTitle || 'New Customer KYC Profile'}</h3>
+              <p className="text-[11px] text-slate-500 mt-0.5">KYC Compliance & Regulatory Registry • Form KYC-01</p>
             </div>
           </div>
           <button 
             type="button"
             onClick={handleClose}
-            className="w-8 h-8 rounded-lg hover:bg-gray-200 text-gray-400 hover:text-gray-700 flex items-center justify-center transition-colors cursor-pointer"
+            className="classic-close-btn"
           >
             <X className="w-4 h-4" />
           </button>
@@ -88,96 +88,96 @@ export default function CreateCustomerModal({ isOpen, onClose, onSuccess }) {
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {error && (
-            <div className="p-2.5 rounded bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 text-rose-500 shrink-0" />
+            <div className="classic-error">
+              <AlertCircle className="w-4 h-4 text-[#dd4b39] shrink-0" />
               <span>{error}</span>
             </div>
           )}
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">First Name *</label>
+              <label className="classic-label">First Name <span className="text-[#dd4b39]">*</span></label>
               <input
                 type="text"
                 required
                 value={formData.firstName}
                 onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
                 placeholder="e.g. Sokha"
-                className="w-full px-3 py-2 rounded border border-gray-300 bg-white text-gray-800 text-xs focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-2xs"
+                className="classic-input"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">Last Name *</label>
+              <label className="classic-label">Last Name <span className="text-[#dd4b39]">*</span></label>
               <input
                 type="text"
                 required
                 value={formData.lastName}
                 onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
                 placeholder="e.g. Chan"
-                className="w-full px-3 py-2 rounded border border-gray-300 bg-white text-gray-800 text-xs focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-2xs"
+                className="classic-input"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-gray-700 mb-1">Email Address *</label>
+            <label className="classic-label">Email Address <span className="text-[#dd4b39]">*</span></label>
             <input
               type="email"
               required
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               placeholder="sokha.chan@trustbank.com"
-              className="w-full px-3 py-2 rounded border border-gray-300 bg-white text-gray-800 text-xs focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-2xs"
+              className="classic-input"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-gray-700 mb-1">Phone Number *</label>
+            <label className="classic-label">Phone Number <span className="text-[#dd4b39]">*</span></label>
             <input
               type="tel"
               required
               value={formData.phoneNumber}
               onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
               placeholder="+85512888999"
-              className="w-full px-3 py-2 rounded border border-gray-300 bg-white text-gray-800 font-mono text-xs focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-2xs"
+              className="classic-input font-mono"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-gray-700 mb-1">National ID / Passport No. *</label>
+            <label className="classic-label">National ID / Passport No. <span className="text-[#dd4b39]">*</span></label>
             <input
               type="text"
               required
               value={formData.nationalIdOrPassport}
               onChange={(e) => setFormData({ ...formData, nationalIdOrPassport: e.target.value })}
               placeholder="e.g. KH-109283741 or P-9821425"
-              className="w-full px-3 py-2 rounded border border-gray-300 bg-white text-gray-800 font-mono text-xs focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 uppercase shadow-2xs"
+              className="classic-input font-mono uppercase"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-gray-700 mb-1">Residential Address</label>
+            <label className="classic-label">Residential Address</label>
             <textarea
               rows={2}
               value={formData.address}
               onChange={(e) => setFormData({ ...formData, address: e.target.value })}
               placeholder="Street #271, Sangkat Boeung Tumpun, Phnom Penh"
-              className="w-full px-3 py-2 rounded border border-gray-300 bg-white text-gray-800 text-xs focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none shadow-2xs"
+              className="classic-input resize-none"
             />
           </div>
 
-          <div className="pt-2 flex items-center justify-end gap-2 border-t border-gray-100">
+          <div className="classic-footer">
             <button
               type="button"
               onClick={handleClose}
-              className="px-4 py-2 rounded-lg text-xs font-semibold text-gray-700 bg-white hover:bg-gray-100 border border-gray-300 transition-colors shadow-2xs cursor-pointer"
+              className="classic-btn-secondary"
             >
               {t.cancel}
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="flex items-center gap-1.5 px-5 py-2 rounded-lg text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-2xs transition-all cursor-pointer disabled:opacity-60"
+              className="classic-btn-primary"
             >
               {loading ? (
                 <Loader2 className="w-3.5 h-3.5 animate-spin" />

@@ -13,44 +13,44 @@ export default function StatCard({
 }) {
   const colorConfigs = {
     blue: {
-      bg: 'bg-[#007bff]',
+      bg: 'bg-[#00c0ef]',
       text: 'text-white',
-      subtext: 'text-white/80',
-      watermark: 'text-white/20',
-      footerBg: 'bg-black/15 hover:bg-black/25',
-      footerText: 'text-white/95',
-    },
-    green: {
-      bg: 'bg-[#28a745]',
-      text: 'text-white',
-      subtext: 'text-white/80',
-      watermark: 'text-white/20',
-      footerBg: 'bg-black/15 hover:bg-black/25',
-      footerText: 'text-white/95',
-    },
-    yellow: {
-      bg: 'bg-[#ffc107]',
-      text: 'text-gray-900',
-      subtext: 'text-gray-800/80',
+      subtext: 'text-white/85',
       watermark: 'text-black/15',
       footerBg: 'bg-black/10 hover:bg-black/20',
-      footerText: 'text-gray-900',
+      footerText: 'text-white',
+    },
+    green: {
+      bg: 'bg-[#00a65a]',
+      text: 'text-white',
+      subtext: 'text-white/85',
+      watermark: 'text-black/15',
+      footerBg: 'bg-black/10 hover:bg-black/20',
+      footerText: 'text-white',
+    },
+    yellow: {
+      bg: 'bg-[#f39c12]',
+      text: 'text-white',
+      subtext: 'text-white/90',
+      watermark: 'text-black/15',
+      footerBg: 'bg-black/10 hover:bg-black/20',
+      footerText: 'text-white',
     },
     red: {
-      bg: 'bg-[#dc3545]',
+      bg: 'bg-[#dd4b39]',
       text: 'text-white',
-      subtext: 'text-white/80',
-      watermark: 'text-white/20',
-      footerBg: 'bg-black/15 hover:bg-black/25',
-      footerText: 'text-white/95',
+      subtext: 'text-white/85',
+      watermark: 'text-black/15',
+      footerBg: 'bg-black/10 hover:bg-black/20',
+      footerText: 'text-white',
     },
   };
 
   const cfg = colorConfigs[color] || colorConfigs.blue;
 
   return (
-    <div className={`rounded-lg shadow-xs overflow-hidden relative ${cfg.bg} ${cfg.text} flex flex-col justify-between transition-transform hover:-translate-y-0.5 duration-200 group`}>
-      {/* Background Watermark Icon (AdminLTE 4 signature watermark) */}
+    <div className={`rounded-[2px] shadow-xs overflow-hidden relative ${cfg.bg} ${cfg.text} flex flex-col justify-between transition-transform hover:-translate-y-0.5 duration-200 group`}>
+      {/* Background Watermark Icon */}
       {Icon && (
         <div className={`absolute top-2 right-3 pointer-events-none transition-transform group-hover:scale-110 duration-300 ${cfg.watermark}`}>
           <Icon className="w-16 h-16 stroke-[1.2]" />

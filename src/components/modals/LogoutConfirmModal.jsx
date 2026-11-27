@@ -11,52 +11,55 @@ export default function LogoutConfirmModal({ isOpen, onClose, onConfirm }) {
   if (!isOpen) return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-fadeIn select-none" onClick={onClose}>
-      <div className="w-full max-w-sm rounded-xl bg-white border border-gray-200 p-6 shadow-2xl relative overflow-hidden text-center" onClick={(e) => e.stopPropagation()}>
-        {/* Close Icon Button */}
-        <button
-          type="button"
-          onClick={onClose}
-          className="absolute top-3.5 right-3.5 w-7 h-7 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-700 flex items-center justify-center transition-colors cursor-pointer"
-        >
-          <X className="w-4 h-4" />
-        </button>
-
-        {/* Warning Icon Badge */}
-        <div className="w-12 h-12 rounded-xl bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center mx-auto mb-3.5 shadow-2xs">
-          <LogOut className="w-6 h-6" />
-        </div>
-
-        {/* Title */}
-        <h3 className="text-base font-bold text-gray-900 tracking-tight">
-          {lang === 'kh' ? 'តើអ្នកពិតជាចង់ចាកចេញមែនទេ?' : 'Confirm Terminal Logout?'}
-        </h3>
-
-        {/* Description */}
-        <p className="text-xs text-gray-500 mt-2 leading-relaxed px-2">
-          {lang === 'kh'
-            ? 'ការចាកចេញនឹងបិទសម័យប្រតិបត្តិការបច្ចុប្បន្នរបស់ស្ថានីយ៍ #TB-0492។ តើអ្នកចង់បន្តចាកចេញឥឡូវនេះឬ?'
-            : 'You are about to sign out from Terminal #TB-0492 and end your active teller session.'}
-        </p>
-
-        {/* Action Buttons: Yes / No */}
-        <div className="mt-6 grid grid-cols-2 gap-2.5 pt-1">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#0b1322]/60 backdrop-blur-[1px] animate-fadeIn select-none" onClick={onClose}>
+      <div className="w-full max-w-sm classic-modal relative text-center" onClick={(e) => e.stopPropagation()}>
+        <div className="h-1.5 bg-[#3c8dbc] border-b border-[#367fa9]" />
+        <div className="p-6">
+          {/* Close Icon Button */}
           <button
             type="button"
             onClick={onClose}
-            className="w-full py-2 px-3 rounded-lg text-xs font-semibold bg-white hover:bg-gray-100 text-gray-700 border border-gray-300 transition-colors shadow-2xs cursor-pointer"
+            className="absolute top-4 right-3.5 w-7 h-7 rounded-[2px] border border-[#d2d6de] hover:bg-[#f4f4f4] text-slate-500 hover:text-slate-800 flex items-center justify-center transition-colors cursor-pointer"
           >
-            {lang === 'kh' ? 'ទេ (No)' : 'No, Cancel'}
+            <X className="w-4 h-4" />
           </button>
 
-          <button
-            type="button"
-            onClick={onConfirm}
-            className="w-full py-2 px-3 rounded-lg text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 transition-colors shadow-2xs flex items-center justify-center gap-1.5 cursor-pointer"
-          >
-            <LogOut className="w-3.5 h-3.5" />
-            <span>{lang === 'kh' ? 'បាទ/ចាស (Yes)' : 'Yes, Logout'}</span>
-          </button>
+          {/* Warning Icon Badge */}
+          <div className="w-12 h-12 rounded-[2px] bg-[#fdf2f2] border-2 border-[#b91c1c]/40 text-[#dd4b39] flex items-center justify-center mx-auto mb-3.5 shadow-inner">
+            <LogOut className="w-6 h-6" />
+          </div>
+
+          {/* Title */}
+          <h3 className="text-base font-bold text-slate-800 tracking-wide">
+            {lang === 'kh' ? 'តើអ្នកពិតជាចង់ចាកចេញមែនទេ?' : 'Confirm Terminal Logout?'}
+          </h3>
+
+          {/* Description */}
+          <p className="text-xs text-slate-500 mt-2 leading-relaxed px-2">
+            {lang === 'kh'
+              ? 'ការចាកចេញនឹងបិទសម័យប្រតិបត្តិការបច្ចុប្បន្នរបស់ស្ថានីយ៍ #TB-0492។ តើអ្នកចង់បន្តចាកចេញឥឡូវនេះឬ?'
+              : 'You are about to sign out from Terminal #TB-0492 and end your active teller session.'}
+          </p>
+
+          {/* Action Buttons: Yes / No */}
+          <div className="mt-6 grid grid-cols-2 gap-2.5 pt-3 border-t border-[#d2d6de]">
+            <button
+              type="button"
+              onClick={onClose}
+              className="classic-btn-secondary w-full"
+            >
+              {lang === 'kh' ? 'ទេ (No)' : 'No, Cancel'}
+            </button>
+
+            <button
+              type="button"
+              onClick={onConfirm}
+              className="classic-btn-danger w-full"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              <span>{lang === 'kh' ? 'បាទ/ចាស (Yes)' : 'Yes, Logout'}</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>,

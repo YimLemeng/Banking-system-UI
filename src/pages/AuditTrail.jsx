@@ -109,156 +109,157 @@ export default function AuditTrail({ auditLogs = [], onRefresh, loading = false 
     <div>
       {/* 1. SCREEN VIEW (Visible on web app, hidden when printing) */}
       <div className="screen-only-report space-y-4 pb-8">
-      {/* AdminLTE 4 Header with Title and Refresh Action */}
+      {/* Classic Heritage Header with Title and Refresh Action */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-        <h1 className="text-2xl font-semibold text-gray-800 tracking-tight">
+        <h1 className="classic-page-title">
           {t.auditTrail}
         </h1>
         <button
           type="button"
           onClick={handleRefreshClick}
           disabled={loading}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-gray-700 bg-white hover:bg-gray-50 border border-gray-300 rounded shadow-2xs transition-colors disabled:opacity-60 cursor-pointer self-start sm:self-auto"
+          className="classic-btn-secondary flex items-center gap-1.5 py-1.5 px-3 disabled:opacity-60 self-start sm:self-auto"
           title="Refresh Audit Logs"
         >
-          <RotateCw className={`w-3.5 h-3.5 text-blue-600 ${loading ? 'animate-spin' : ''}`} />
-          <span>{loading ? (lang === 'kh' ? 'កំពុងទាញ...' : 'Refreshing...') : 'Refresh'}</span>
+          <RotateCw className={`w-3.5 h-3.5 text-slate-800 ${loading ? 'animate-spin' : ''}`} />
+          <span>{loading ? (lang === 'kh' ? 'កំពុងទាញ...' : 'Refreshing...') : (lang === 'kh' ? 'ធ្វើបច្ចុប្បន្នភាព' : 'Refresh')}</span>
         </button>
       </div>
 
-      {/* AdminLTE 4 Data Table Card */}
-      <div className="bg-white rounded-lg border border-gray-200 shadow-xs p-5 space-y-3.5">
+      {/* Classic Heritage Data Table Card */}
+      <div className="classic-table-card">
         {/* Card Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="classic-table-header">
           <div className="flex items-center gap-3">
-            <h3 className="text-base font-semibold text-gray-800">
-              Audit Event Logs
+            <h3 className="text-base font-bold text-slate-800 tracking-wide">
+              {lang === 'kh' ? 'កំណត់ត្រាព្រឹត្តិការណ៍សវនកម្ម' : 'Audit Event Logs'}
             </h3>
-            <span className="text-xs text-gray-500 font-medium">
-              ({filtered.length} total entries)
+            <span className="text-xs text-slate-500 font-medium">
+              ({filtered.length} {lang === 'kh' ? 'កំណត់ត្រាសរុប' : 'total entries'})
             </span>
           </div>
 
           <div className="relative">
-            <Search className="w-3.5 h-3.5 text-gray-400 absolute left-2.5 top-2 pointer-events-none" />
+            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2 pointer-events-none" />
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Filter rows..."
-              className="pl-8 pr-3 py-1 text-xs rounded border border-gray-300 bg-white text-gray-700 placeholder-gray-400 focus:outline-none focus:border-blue-500 w-52 sm:w-64"
+              placeholder={lang === 'kh' ? 'ស្វែងរកទិន្នន័យ...' : 'Filter rows...'}
+              className="classic-input pl-8 pr-3 py-1 w-52 sm:w-64"
             />
           </div>
         </div>
 
+        <div className="p-5 space-y-3.5">
         {/* Action Toolbar */}
-        <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-b border-gray-100 pb-3">
+        <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-b border-slate-200 pb-3">
           <div className="flex items-center gap-2">
             <button
               onClick={handleExportCSV}
-              className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-gray-700 bg-white hover:bg-gray-50 border border-gray-300 rounded shadow-2xs transition-colors"
+              className="classic-toolbar-btn"
             >
-              <Download className="w-3.5 h-3.5 text-gray-500" />
-              <span>Export CSV</span>
+              <Download className="w-3.5 h-3.5 text-slate-500" />
+              <span>{lang === 'kh' ? 'នាំចេញ CSV' : 'Export CSV'}</span>
             </button>
             <button
               onClick={handleExportJSON}
-              className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-gray-700 bg-white hover:bg-gray-50 border border-gray-300 rounded shadow-2xs transition-colors"
+              className="classic-toolbar-btn"
             >
-              <FileCode className="w-3.5 h-3.5 text-gray-500" />
-              <span>Export JSON</span>
+              <FileCode className="w-3.5 h-3.5 text-slate-500" />
+              <span>{lang === 'kh' ? 'នាំចេញ JSON' : 'Export JSON'}</span>
             </button>
             <button
               onClick={() => window.print()}
-              className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-gray-700 bg-white hover:bg-gray-50 border border-gray-300 rounded shadow-2xs transition-colors"
+              className="classic-toolbar-btn"
             >
-              <Printer className="w-3.5 h-3.5 text-gray-500" />
-              <span>Print</span>
+              <Printer className="w-3.5 h-3.5 text-slate-500" />
+              <span>{lang === 'kh' ? 'បោះពុម្ព' : 'Print'}</span>
             </button>
           </div>
         </div>
 
         {/* Table */}
-        <div className="overflow-x-auto border border-gray-200 rounded">
-          <table className="w-full text-left text-xs border-collapse">
+        <div className="erp-table-wrap">
+          <table className="erp-table">
             <thead>
-              <tr className="bg-gray-50/80 border-b border-gray-200 text-gray-700 font-semibold">
-                <th className="py-2.5 px-3 w-12">
-                  <div className="flex items-center justify-between">
+              <tr>
+                <th className="w-12">
+                  <div className="flex items-center justify-between gap-1">
                     <span>#</span>
-                    <span className="text-[10px] text-gray-400">▲</span>
+                    <span className="text-[10px] text-slate-400">↑↓</span>
                   </div>
                 </th>
-                <th className="py-2.5 px-3">
-                  <div className="flex items-center justify-between">
-                    <span>Timestamp</span>
-                    <span className="text-[10px] text-gray-400">▲</span>
+                <th>
+                  <div className="flex items-center justify-between gap-1">
+                    <span>{lang === 'kh' ? 'កាលបរិច្ឆេទ' : 'Timestamp'}</span>
+                    <span className="text-[10px] text-slate-400">↑↓</span>
                   </div>
                 </th>
-                <th className="py-2.5 px-3">
-                  <div className="flex items-center justify-between">
-                    <span>User</span>
-                    <span className="text-[10px] text-gray-400">▲</span>
+                <th>
+                  <div className="flex items-center justify-between gap-1">
+                    <span>{lang === 'kh' ? 'អ្នកប្រើប្រាស់' : 'User'}</span>
+                    <span className="text-[10px] text-slate-400">↑↓</span>
                   </div>
                 </th>
-                <th className="py-2.5 px-3">
-                  <div className="flex items-center justify-between">
-                    <span>Action</span>
-                    <span className="text-[10px] text-gray-400">▲</span>
+                <th>
+                  <div className="flex items-center justify-between gap-1">
+                    <span>{lang === 'kh' ? 'ប្រតិបត្តិការ' : 'Action'}</span>
+                    <span className="text-[10px] text-slate-400">↑↓</span>
                   </div>
                 </th>
-                <th className="py-2.5 px-3">
-                  <div className="flex items-center justify-between">
-                    <span>Resource</span>
-                    <span className="text-[10px] text-gray-400">▲</span>
+                <th>
+                  <div className="flex items-center justify-between gap-1">
+                    <span>{lang === 'kh' ? 'ធនធាន' : 'Resource'}</span>
+                    <span className="text-[10px] text-slate-400">↑↓</span>
                   </div>
                 </th>
-                <th className="py-2.5 px-3 text-center">
+                <th className="text-center">
                   <div className="flex items-center justify-center gap-1">
-                    <span>Status</span>
-                    <span className="text-[10px] text-gray-400">▲</span>
+                    <span>{lang === 'kh' ? 'ស្ថានភាព' : 'Status'}</span>
+                    <span className="text-[10px] text-slate-400">↑↓</span>
                   </div>
                 </th>
-                <th className="py-2.5 px-3">Description</th>
+                <th>{lang === 'kh' ? 'ការពិពណ៌នា' : 'Description'}</th>
               </tr>
             </thead>
 
             {/* Table Rows */}
-            <tbody className="divide-y divide-gray-100 text-gray-700 font-normal">
+            <tbody>
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan="7" className="text-center py-10 text-gray-400">
+                  <td colSpan="7" className="text-center py-10 text-slate-400">
                     No matching audit records found.
                   </td>
                 </tr>
               ) : (
                 paginated.map((log, index) => (
-                  <tr key={log.id || index} className="hover:bg-gray-50/80 transition-colors">
-                    <td className="py-2.5 px-3 font-medium text-gray-500">
+                  <tr key={log.id || index}>
+                    <td className="font-mono text-slate-500">
                       {(currentPage - 1) * pageSize + index + 1}
                     </td>
-                    <td className="py-2.5 px-3 text-gray-500 font-mono text-[11px] whitespace-nowrap">
+                    <td className="text-slate-600 font-mono text-[11px] whitespace-nowrap">
                       {formatDateTime(log.createdAt || log.timestamp)}
                     </td>
-                    <td className="py-2.5 px-3 font-semibold text-gray-900">
+                    <td className="font-semibold text-slate-800">
                       {log.username || 'System'}
                     </td>
-                    <td className="py-2.5 px-3">
+                    <td>
                       <span className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-bold ${getActionBadge(log.action)}`}>
                         {log.action}
                       </span>
                     </td>
-                    <td className="py-2.5 px-3 font-mono text-gray-600 text-[11px]">
+                    <td className="font-mono text-slate-600 text-[11px]">
                       {log.resource} {log.resourceId ? `(#${log.resourceId})` : ''}
                     </td>
-                    <td className="py-2.5 px-3 text-center">
-                      <span className={`inline-block px-2.5 py-0.5 rounded-full text-[11px] font-semibold text-white ${
-                        log.status === 'FAILED' ? 'bg-[#dc3545]' : 'bg-[#28a745]'
-                      }`}>
-                        {log.status === 'FAILED' ? 'Failed' : 'Active'}
+                    <td className="text-center">
+                      <span className={log.status === 'FAILED' ? 'erp-status-danger' : 'erp-status-active'}>
+                        {log.status === 'FAILED'
+                          ? (lang === 'kh' ? 'បរាជ័យ' : 'Failed')
+                          : (lang === 'kh' ? 'សកម្ម' : 'Active')}
                       </span>
                     </td>
-                    <td className="py-2.5 px-3 text-gray-600 text-xs">
+                    <td className="text-slate-600 text-xs">
                       {log.description}
                     </td>
                   </tr>
@@ -279,6 +280,7 @@ export default function AuditTrail({ auditLogs = [], onRefresh, loading = false 
             setCurrentPage(1);
           }}
         />
+        </div>
       </div>
     </div>
 

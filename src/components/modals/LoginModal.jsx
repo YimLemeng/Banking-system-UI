@@ -42,23 +42,23 @@ export default function LoginModal({ isOpen, onClose, onSuccess }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-fadeIn" onClick={onClose}>
-      <div className="w-full max-w-sm bg-white border border-gray-200 rounded-xl shadow-2xl overflow-hidden" onClick={(e) => e.stopPropagation()}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0b1322]/60 backdrop-blur-[1px] animate-fadeIn" onClick={onClose}>
+      <div className="w-full max-w-sm classic-modal" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
-        <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between bg-gray-50/90">
+        <div className="classic-header">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 border border-blue-200 flex items-center justify-center shadow-2xs">
+            <div className="classic-header-icon">
               <Lock className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-bold text-gray-900 text-base">Terminal Authentication</h3>
-              <p className="text-xs text-gray-500 mt-0.5">JWT Security Token Access</p>
+              <h3 className="font-bold text-slate-800 text-base tracking-wide">Terminal Authentication</h3>
+              <p className="text-[11px] text-slate-500 mt-0.5">JWT Security Token Access</p>
             </div>
           </div>
           <button 
             type="button"
             onClick={onClose}
-            className="w-8 h-8 rounded-lg hover:bg-gray-200 text-gray-400 hover:text-gray-700 flex items-center justify-center transition-colors cursor-pointer"
+            className="classic-close-btn"
           >
             <X className="w-4 h-4" />
           </button>
@@ -67,14 +67,14 @@ export default function LoginModal({ isOpen, onClose, onSuccess }) {
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {error && (
-            <div className="p-2.5 rounded bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 text-rose-500 shrink-0" />
+            <div className="classic-error">
+              <AlertCircle className="w-4 h-4 text-[#dd4b39] shrink-0" />
               <span>{error}</span>
             </div>
           )}
 
           <div>
-            <label className="block text-xs font-semibold text-gray-700 mb-1">
+            <label className="classic-label">
               Username, Email or Phone
             </label>
             <input
@@ -83,12 +83,12 @@ export default function LoginModal({ isOpen, onClose, onSuccess }) {
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value)}
               placeholder="admin"
-              className="w-full px-3 py-2 rounded border border-gray-300 bg-white text-gray-800 text-xs focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-2xs"
+              className="classic-input"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-gray-700 mb-1">
+            <label className="classic-label">
               Password
             </label>
             <input
@@ -97,7 +97,7 @@ export default function LoginModal({ isOpen, onClose, onSuccess }) {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              className="w-full px-3 py-2 rounded border border-gray-300 bg-white text-gray-800 text-xs focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-2xs"
+              className="classic-input"
             />
           </div>
 
@@ -105,7 +105,7 @@ export default function LoginModal({ isOpen, onClose, onSuccess }) {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2 px-4 rounded-lg text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-2xs transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+              className="classic-btn-primary w-full py-2.5"
             >
               <KeyRound className="w-4 h-4" />
               <span>{loading ? 'Authenticating...' : 'Sign In to Terminal'}</span>

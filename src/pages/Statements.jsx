@@ -175,7 +175,7 @@ export default function Statements({ accounts = [], onRefresh }) {
               <span>
                 {loadingTx 
                   ? (lang === 'kh' ? 'កំពុងទាញ...' : 'Refreshing...') 
-                  : 'Refresh'}
+                  : (lang === 'kh' ? 'ផ្ទុកឡើងវិញ' : 'Refresh')}
               </span>
             </button>
             <button
@@ -194,7 +194,7 @@ export default function Statements({ accounts = [], onRefresh }) {
               ) : (
                 <>
                   <Printer className="w-3.5 h-3.5" />
-                  <span>{!selectedAccount ? (lang === 'kh' ? 'ជ្រើសរើសគណនី' : 'Select Account') : 'Export PDF'}</span>
+                  <span>{!selectedAccount ? (lang === 'kh' ? 'ជ្រើសរើសគណនី' : 'Select Account') : (lang === 'kh' ? 'នាំចេញ PDF' : 'Export PDF')}</span>
                 </>
               )}
             </button>
@@ -202,27 +202,27 @@ export default function Statements({ accounts = [], onRefresh }) {
         </div>
 
         {/* Filter bar */}
-        <div className="bg-white rounded-lg border border-gray-200 shadow-xs p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="classic-form-card p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="relative flex-1 max-w-md">
-            <Search className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-2.5 pointer-events-none" />
+            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5 pointer-events-none" />
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search statement reference or description..."
-              className="w-full pl-8 pr-3 py-1.5 rounded border border-gray-300 bg-white text-gray-800 text-xs focus:outline-none focus:border-blue-500 shadow-2xs"
+              placeholder={lang === 'kh' ? 'ស្វែងរកតាមលេខយោង ឬការពិពណ៌នា...' : 'Search statement reference or description...'}
+              className="classic-input pl-8 py-1.5"
             />
           </div>
 
           <div className="flex items-center gap-2.5">
-            <label className="text-xs text-gray-700 font-semibold whitespace-nowrap">
+            <label className="classic-label mb-0 whitespace-nowrap">
               {lang === 'kh' ? 'ជ្រើសរើសលេខគណនី:' : 'Select Account Number:'}
             </label>
             <div className="relative">
               <select
                 value={selectedAccount}
                 onChange={handleAccountChange}
-                className="appearance-none pl-3 pr-8 py-1.5 rounded border border-gray-300 hover:border-gray-400 bg-white text-gray-800 font-mono text-xs focus:outline-none focus:border-blue-500 cursor-pointer shadow-2xs transition-colors"
+                className="classic-input appearance-none pl-3 pr-8 py-1.5 font-mono cursor-pointer"
               >
                 <option value="">{lang === 'kh' ? '-- ជ្រើសរើសលេខគណនី --' : '-- Select Account Number --'}</option>
                 {accounts.map(acc => (
@@ -231,8 +231,8 @@ export default function Statements({ accounts = [], onRefresh }) {
                   </option>
                 ))}
               </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2.5 text-gray-400">
-                <ChevronDown className="w-3.5 h-3.5 text-blue-600" />
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2.5 text-slate-500">
+                <ChevronDown className="w-3.5 h-3.5 text-slate-800" />
               </div>
             </div>
           </div>

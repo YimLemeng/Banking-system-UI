@@ -1,5 +1,6 @@
 import React from 'react';
 import { ChevronDown } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 export default function TablePagination({
   currentPage = 1,
@@ -9,6 +10,7 @@ export default function TablePagination({
   onPageSizeChange,
   pageSizeOptions = [10, 25, 50, 100],
 }) {
+  const { lang } = useAuth();
   const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
   const validPage = Math.min(Math.max(1, currentPage), totalPages);
 
@@ -32,15 +34,23 @@ export default function TablePagination({
   const pageNumbers = getPageNumbers();
 
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-2 text-xs text-gray-500">
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-3 text-xs text-slate-500">
       <div>
-        Showing <span className="font-semibold text-gray-700">{startEntry}</span> to{' '}
-        <span className="font-semibold text-gray-700">{endEntry}</span> of{' '}
-        <span className="font-semibold text-gray-700">{totalItems}</span> entries
+        {lang === 'kh' ? (
+          <>
+            បង្ហាញ <span className="font-semibold text-slate-700">{startEntry}-{endEntry}</span> នៃ{' '}
+            <span className="font-semibold text-slate-700">{totalItems}</span> លទ្ធផល
+          </>
+        ) : (
+          <>
+            Showing <span className="font-semibold text-slate-700">{startEntry}-{endEntry}</span> of{' '}
+            <span className="font-semibold text-slate-700">{totalItems}</span> results
+          </>
+        )}
       </div>
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-2">
-          <span className="text-gray-500 font-medium">Page Size</span>
+          <span className="text-slate-500 font-medium">{lang === 'kh' ? 'ជួរ' : 'Rows'}</span>
           <div className="relative inline-flex items-center group">
             <select
               value={pageSize}
@@ -53,36 +63,28 @@ export default function TablePagination({
                   onPageChange(1);
                 }
               }}
-              className="appearance-none bg-white hover:bg-gray-50/80 text-gray-700 text-xs font-semibold pl-2.5 pr-7 py-1 rounded border border-gray-300 hover:border-gray-400 shadow-2xs focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 cursor-pointer transition-colors"
+              className="appearance-none bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold pl-2.5 pr-7 py-1 rounded border border-slate-300 hover:border-slate-400 shadow-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 cursor-pointer transition-colors"
             >
               {pageSizeOptions.map((opt) => (
-                <option key={opt} value={opt} className="bg-white text-gray-800">
+                <option key={opt} value={opt} className="bg-white text-slate-800">
                   {opt}
                 </option>
               ))}
             </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2 text-gray-400 group-hover:text-gray-600 transition-colors">
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2 text-slate-400 group-hover:text-slate-600 transition-colors">
               <ChevronDown className="w-3.5 h-3.5" />
             </div>
           </div>
         </div>
 
-        <div className="inline-flex rounded-md shadow-2xs">
-          <button
-            type="button"
-            disabled={validPage <= 1}
-            onClick={() => onPageChange && onPageChange(1)}
-            className="px-2.5 py-1 text-xs border border-gray-300 bg-white text-gray-600 rounded-l hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
-          >
-            First
-          </button>
+        <div className="inline-flex items-center gap-1">
           <button
             type="button"
             disabled={validPage <= 1}
             onClick={() => onPageChange && onPageChange(validPage - 1)}
-            className="px-2.5 py-1 text-xs border-t border-b border-r border-gray-300 bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+            className="px-2.5 py-1 text-xs rounded border border-slate-300 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-45 disabled:cursor-not-allowed cursor-pointer transition-colors"
           >
-            Prev
+            {lang === 'kh' ? 'មុន' : 'Previous'}
           </button>
 
           {pageNumbers.map((num) => {
@@ -92,10 +94,10 @@ export default function TablePagination({
                 key={num}
                 type="button"
                 onClick={() => onPageChange && onPageChange(num)}
-                className={`px-2.5 py-1 text-xs border-t border-b border-r border-gray-300 cursor-pointer ${
+                className={`min-w-[28px] px-2 py-1 text-xs rounded border cursor-pointer transition-colors ${
                   isActive
-                    ? 'bg-gray-800 text-white font-semibold'
-                    : 'bg-white text-gray-600 hover:bg-gray-50'
+                    ? 'bg-[#2563eb] text-white border-[#2563eb] font-semibold'
+                    : 'bg-white text-slate-600 border-slate-300 hover:bg-slate-50'
                 }`}
               >
                 {num}
@@ -107,17 +109,9 @@ export default function TablePagination({
             type="button"
             disabled={validPage >= totalPages}
             onClick={() => onPageChange && onPageChange(validPage + 1)}
-            className="px-2.5 py-1 text-xs border-t border-b border-r border-gray-300 bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+            className="px-2.5 py-1 text-xs rounded border border-slate-300 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-45 disabled:cursor-not-allowed cursor-pointer transition-colors"
           >
-            Next
-          </button>
-          <button
-            type="button"
-            disabled={validPage >= totalPages}
-            onClick={() => onPageChange && onPageChange(totalPages)}
-            className="px-2.5 py-1 text-xs border-t border-b border-r border-gray-300 bg-white text-gray-600 rounded-r hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
-          >
-            Last
+            {lang === 'kh' ? 'បន្ទាប់' : 'Next'}
           </button>
         </div>
       </div>
