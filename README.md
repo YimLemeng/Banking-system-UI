@@ -29,12 +29,16 @@ Production-grade, enterprise core banking terminal web application engineered wi
 
 ## 🎨 Enterprise Architecture & Design System
 
-### 1. Bilingual Typography Engine (Khmer OS Battambang)
-- Custom typography engine configured with `@font-face` rules for `Khmer OS Battambang` (Regular & Bold) covering Unicode ranges `U+1780-17FF` and `U+19E0-19FF`.
-- Strictly maintains OpenType complex script shaping (GSUB/GPOS) with `letter-spacing: normal` and `line-height: 1.7` to prevent subscript consonant (`ជើង`) and vowel detachment.
-- Seamless instantaneous language switcher between **English (EN)** and **ភាសាខ្មែរ (Khmer)** across all navigation bars, modals, tables, and reports.
+### 1. Classic ERP Interface & Table Design System
+- Clean AdminLTE / Classic ERP layout featuring a `#ecf0f5` workspace canvas, `#3c8dbc` top header bar, and full-height `#222d32` collapsible navigation sidebar with menu search (`Filter menu...`).
+- Standardized `.erp-table-wrap` & `.erp-table` data tables across all modules (`Dashboard`, `Customer KYC`, `Customer Accounts`, `System Users`, `Audit Trail`) with sortable `↑↓` column headers, pastel status pills (`Active` / `Suspended` / `Invited`), and compact inline action buttons (`View`, `Edit`, `+ Dep`, `- With`, `Transfer`).
 
-### 2. Official Institutional Print Reports (`OfficialReportPrint`)
+### 2. Bilingual Engine & Flag Language Toggle (`EN` / `ខ្មែរ`)
+- Single-click language switcher in the header (and login screen) displaying crisp inline SVG **UK** (`EN`) and **Cambodia** (`ខ្មែរ`) flags.
+- Full bilingual localization across navigation, KPI cards, table headers, status badges, action buttons, pagination (`TablePagination`), modals, and print reports.
+- Custom typography engine configured with `Khmer OS Battambang` / `Noto Sans Khmer` covering Unicode ranges `U+1780-17FF` and `U+19E0-19FF`, maintaining proper OpenType complex script shaping (`GSUB/GPOS`) without subscript consonant (`ជើង`) or vowel detachment.
+
+### 3. Official Institutional Print Reports (`OfficialReportPrint`)
 Dedicated print media system (`@media print`) that transforms web data tables into formal A4 bank documents:
 - **Neoclassical Bank Crest**: Vector emblem in Navy `#0f2b48` and Imperial Gold `#f59e0b`.
 - **Regulatory Metadata**: National Bank of Cambodia commercial banking license `#0492`, Head Office details, SWIFT Code `TRUSKHP1`, unique Document Ref number, generation timestamp, and reporting officer identity.
@@ -42,15 +46,15 @@ Dedicated print media system (`@media print`) that transforms web data tables in
 - **Print-Specific Table Styling**: High-contrast navy headers, zebra-striped rows, border-defined status pills, and page break prevention.
 - **Dual Verification Seals**: `Prepared by Reporting Officer` block and `Approved by Branch Auditor / NBC Verified Seal` block.
 
-### 3. Interactive Operation Overlays (`LoadingOverlay`)
+### 4. Interactive Operation Overlays (`LoadingOverlay`)
 - Integrated `LoadingContext` with dual-ring concentric spinner animation.
 - Context-aware bilingual status messages for operations like `កំពុងទាញយកទិន្នន័យអ្នកប្រើប្រាស់ប្រព័ន្ធ...` and `Refreshing Depository Ledger & Accounts...`.
 - Minimum smooth duration handling to avoid flickering on ultra-fast network responses.
 
-### 4. Enterprise Table Pagination (`TablePagination`)
-- Standardized enterprise data table footer component.
+### 5. Enterprise Table Pagination (`TablePagination`)
+- Standardized bilingual data table footer component (`Showing X-Y of Z results` / `បង្ហាញ X-Y នៃ Z លទ្ធផល`).
 - Selectable page sizing (`5`, `10`, `25`, `50`, `100` entries per page).
-- Accessible navigation buttons (First, Previous, Next, Last) with current index range display.
+- Accessible navigation buttons (`Previous`, page numbers, `Next` / `មុន`, `បន្ទាប់`) with current index range display.
 
 ---
 
